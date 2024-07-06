@@ -1,6 +1,5 @@
 import pandas as pd
-import os
-import csv
+
 
 
 class CSVHandler:
@@ -8,34 +7,7 @@ class CSVHandler:
     def __init__(self, file_path: str) -> None:
 
         self.file_path = file_path
-
-
-    def validate_csv(self):
-        if not self.file_path.lower().endswith('.csv'):
-            print('Provided file does not have a .csv extension')
-            return False
-        
-        if os.path.getsize(self.file_path) == 0:
-            print(f'File is empty!')
-            return False
-        
-        try:
-            with open(self.file_path, 'r') as file:
-                sample = csv.Sniffer().sniff(file.read(1024))
-                file.seek(0)
-                reader = csv.reader(file, delimiter=sample.delimiter)
-                headers = next(reader, None)
-                if headers is None or len(headers) < 2:
-                    print('The file does not appear to be a valid CSV file')
-                    return False
-                
-        except Exception as e:
-            print(f'An error occurred while checking the file: {str(e)}')
-            return False
-        
-        return True
-
-
+        self.columns_to_keep = ['Data księgowania', 'Nadawca / Odbiorca', 'Tytułem', 'Kwota operacji', 'Typ operacji', 'Kategoria']
 
     def load_csv(self):
         try:
@@ -55,6 +27,11 @@ class CSVHandler:
             print(f'Error occurred: {str(e)}')
             return None
         
+    def create_df_for_db(self, base_df):
+        new_df = base_df[self.columns_to_keep]
+        return new_df
+
+
 
 
 
