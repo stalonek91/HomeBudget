@@ -6,7 +6,7 @@ from typing import Optional
 #Schema for transaction table operation
 class TransactionSchema(BaseModel):
     
-    id: Optional[int]
+    id: Optional[int] = None
     date: date
     receiver: str
     title: str

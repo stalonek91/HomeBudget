@@ -13,12 +13,15 @@ def get_transactions(db: Session = Depends(get_sql_db)):
     return transactions
 
 
-#FIXME: nie dziala validacja
+
 @router.post("/add_transaction", response_model=schemas.TransactionSchema, status_code=status.HTTP_201_CREATED)
 def add_transaction(transaction: schemas.TransactionSchema, db: Session = Depends(get_sql_db)):
                     new_transaction = models.Transaction(
                             **transaction.model_dump()
                     )
+                    db.add(new_transaction)
+                    db.commit()
+                    db.refresh(new_transaction)
 
-                    print(f'{new_transaction.id}')
-                    return None
+                    
+                    return new_transaction
