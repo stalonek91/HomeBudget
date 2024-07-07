@@ -12,6 +12,7 @@ csv_instance = CSVHandler(path_to_csv)
 
 
 app = FastAPI()
+app.include_router(db_operations.router)
 models.base.metadata.create_all(bind=engine)
 
 if __name__ == '__main__':
@@ -19,7 +20,8 @@ if __name__ == '__main__':
     # print(df.head(5))
     # new_df = csv_instance.create_df_for_db(df)
     # print(new_df.head(15))
-    app.include_router(db_operations.router)
+    pass
+    
 
 
 
