@@ -7,7 +7,12 @@ class CSVHandler:
     def __init__(self, file_path: str) -> None:
 
         self.file_path = file_path
-        self.columns_to_keep = ['Data księgowania', 'Nadawca / Odbiorca', 'Tytułem', 'Kwota operacji', 'Typ operacji', 'Kategoria']
+        self.columns_to_keep = [
+            'Data księgowania',
+            'Nadawca / Odbiorca',
+            'Tytułem', 'Kwota operacji',
+            'Typ operacji',
+            'Kategoria']
 
     def load_csv(self):
         try:
