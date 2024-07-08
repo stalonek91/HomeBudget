@@ -13,6 +13,14 @@ def get_transactions(db: Session = Depends(get_sql_db)):
     return transactions
 
 
+@router.get("/get_transaction_by_id/{id}", response_model=schemas.ReturnedTransaction, status_code=status.HTTP_200_OK)
+def get_transaction_by_id(id: int, db: Session = Depends(get_sql_db)):
+        transaction = db.query(models.Transaction).filter(models.Transaction.id == id).first()
+        if not transaction:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Transaction with id: {id} not found!')
+        
+        return transaction
+
 
 @router.post("/add_transaction", response_model=schemas.TransactionSchema, status_code=status.HTTP_201_CREATED)
 def add_transaction(transaction: schemas.TransactionSchema, db: Session = Depends(get_sql_db)):
@@ -25,3 +33,44 @@ def add_transaction(transaction: schemas.TransactionSchema, db: Session = Depend
 
                     
                     return new_transaction
+
+
+@router.put("/update_transaction/{id}", response_model=schemas.ReturnedTransaction, status_code=status.HTTP_200_OK)
+def update_transaction(id: int, transaction_data: schemas.TransactionSchema = Body(...), db: Session = Depends(get_sql_db)):
+        transaction_query = db.query(models.Transaction).filter(models.Transaction.id == id)
+        transaction = transaction_query.first()
+
+
+        if not transaction:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Transaction with id: {id} not found!')
+        
+        print(f'Transaction_data: {transaction_data.model_dump()}')
+        try:
+            transaction_query.update(transaction_data.model_dump(), synchronize_session=False)
+            db.commit()
+        except Exception as e:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Following error occured {str(e)}')
+        
+        return transaction
+
+
+@router.patch("/partialupdate_transaction/{id}", response_model=schemas.ReturnedTransaction, status_code=status.HTTP_200_OK)
+def partial_update(id: int, transaction_data: schemas.UpdateTransactionSchema = Body(...), db: Session = Depends(get_sql_db)):
+        
+        transaction_query = db.query(models.Transaction).filter(models.Transaction.id == id)
+        transaction = transaction_query.first()
+
+        if not transaction:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Looked transaction not found id: {id}')
+        
+        transaction_body = transaction_data.model_dump(exclude_unset=True)
+        print(f'Printing content for PATCH request: {transaction_body}')
+
+        for k,v in transaction_body.items():
+                setattr(transaction,k,v)
+        
+        db.commit()
+        db.refresh(transaction)
+
+        return transaction
+        
