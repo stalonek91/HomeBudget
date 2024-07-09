@@ -1,11 +1,30 @@
 from fastapi import status, Depends, Body, HTTPException, Request, APIRouter
 from sqlalchemy.orm import Session
 from typing import List
+from .. csv_handler import CSVHandler
 from .. database import get_sql_db
 import app.schemas as schemas
 import app.models as models
 
 router = APIRouter(tags=["db_operations"], prefix="/transactions")
+
+#TODO: check ruff
+#route for adding processed DF to DB
+
+@router.get("/add_csv", status_code=status.HTTP_202_ACCEPTED)
+def add_csv(db: Session = Depends(get_sql_db)):
+        
+        path_to_csv = '/Users/sylwestersojka/Documents/HomeBudget/Transactions.csv'
+        csv_instance = CSVHandler(path_to_csv)
+        df = csv_instance.load_csv()
+        new_df = csv_instance.create_df_for_db(df)
+        print(new_df.head(15))
+
+        df_to_dict = new_df.to_dict()
+
+        return df_to_dict
+
+
 
 @router.get("/get_transactions", response_model=List[schemas.TransactionSchema], status_code=status.HTTP_200_OK)
 def get_transactions(db: Session = Depends(get_sql_db)):

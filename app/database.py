@@ -2,9 +2,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 
-SQLALCHEMY_DATABASE_URL = os.getenv("DB_URL")
-print("Environment variable DB_URL:", os.getenv("DB_URL"))
-print("SQLAlchemy path:", os.__file__)
+SQLALCHEMY_DATABASE_URL = "postgresql://sylwestersojka:123@localhost/homebudget_db"
+
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

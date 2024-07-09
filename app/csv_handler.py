@@ -33,6 +33,7 @@ class CSVHandler:
             return None
         
     def create_df_for_db(self, base_df):
+        base_df.fillna("", inplace=True)
         new_df = base_df[self.columns_to_keep]
         return new_df
 
