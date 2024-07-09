@@ -9,20 +9,33 @@ import app.models as models
 router = APIRouter(tags=["db_operations"], prefix="/transactions")
 
 #TODO: check ruff
-#route for adding processed DF to DB
+"""Revised Plan
+Load and Clean CSV: Load the CSV file and process it.
+Rename Columns: Rename the DataFrame columns to match the SQLAlchemy model attributes.
+Convert DataFrame to Dictionary: Convert the DataFrame to a list of dictionaries.
+Create and Add Transactions: Iterate over the dictionaries, create Transaction model instances, and add them to the database."""
 
-@router.get("/add_csv", status_code=status.HTTP_202_ACCEPTED)
-def add_csv(db: Session = Depends(get_sql_db)):
+@router.post("/add_csv",response_model=schemas.ReturnedTransaction, status_code=status.HTTP_201_CREATED)
+def add_csv( db: Session = Depends(get_sql_db)):
         
         path_to_csv = '/Users/sylwestersojka/Documents/HomeBudget/Transactions.csv'
         csv_instance = CSVHandler(path_to_csv)
         df = csv_instance.load_csv()
         new_df = csv_instance.create_df_for_db(df)
-        print(new_df.head(15))
 
-        df_to_dict = new_df.to_dict()
+        df_to_dict = new_df.to_dict(orient='index')
 
-        return df_to_dict
+        print(df_to_dict[0])
+    
+        new_transaction = models.Transaction(
+                **df_to_dict[0]
+        )
+
+        db.add(new_transaction)
+        db.commit()
+        db.refresh(new_transaction)
+
+        return new_transaction
 
 
 
