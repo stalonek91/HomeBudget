@@ -16,26 +16,37 @@ Convert DataFrame to Dictionary: Convert the DataFrame to a list of dictionaries
 Create and Add Transactions: Iterate over the dictionaries, create Transaction model instances, and add them to the database."""
 
 @router.post("/add_csv",response_model=schemas.ReturnedTransaction, status_code=status.HTTP_201_CREATED)
-def add_csv( db: Session = Depends(get_sql_db)):
+def add_csv(db: Session = Depends(get_sql_db)):
         
-        path_to_csv = '/Users/sylwestersojka/Documents/HomeBudget/Transactions.csv'
-        csv_instance = CSVHandler(path_to_csv)
-        df = csv_instance.load_csv()
+
+    path_to_csv = '/Users/sylwestersojka/Documents/HomeBudget/Transactions.csv'
+    csv_instance = CSVHandler(path_to_csv)
+    df = csv_instance.load_csv()
+
+    if df is not None:
         new_df = csv_instance.create_df_for_db(df)
+        if new_df is None:
+                raise HTTPException(status_code=500, detail="Error processing DataFrame in create_df_for_db")
+        
+        new_df = csv_instance.rename_columns(new_df)
+        if new_df is None:
+                raise HTTPException(status_code=500, detail="Error processing DataFrame in create_df_for_db")
 
-        df_to_dict = new_df.to_dict(orient='index')
-
-        print(df_to_dict[0])
+        print(f"Type of new_df: {type(new_df)}")
+        print(new_df.head())
     
-        new_transaction = models.Transaction(
-                **df_to_dict[0]
-        )
 
-        db.add(new_transaction)
-        db.commit()
-        db.refresh(new_transaction)
+        try:
+            df_to_dict = new_df.to_dict(orient='index')
+            print(df_to_dict[0])
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error converting DataFrame to dict: {str(e)}")
+        
+        #adding to DB
 
-        return new_transaction
+
+        
+    return None
 
 
 

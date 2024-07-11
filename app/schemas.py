@@ -40,3 +40,15 @@ class ReturnedTransaction(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class AddTransaction(BaseModel):
+        date: date
+        receiver: str
+        title: str
+        amount: float
+        transaction_type: str
+        category: str
+
+        class Config:
+             orm_mode = True
