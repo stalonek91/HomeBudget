@@ -89,6 +89,13 @@ class CSVHandler:
             # print(f"Type of 'date' column after formatting: {last_df['date'].dtype}")
             # print(f"Type of first element in 'date' column after formatting: {type(last_df['date'][0])}")
 
+
+
+            #Changing amount column type
+            last_df['amount'] = last_df['amount'].str.replace(',', '.').str.replace(' ', '').astype(float)
+
+
+
         except Exception as e:
             print(f'Error occurred: {str(e)}')
             return None

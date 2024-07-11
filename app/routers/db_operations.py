@@ -43,10 +43,14 @@ def add_csv(db: Session = Depends(get_sql_db)):
             raise HTTPException(status_code=500, detail=f"Error converting DataFrame to dict: {str(e)}")
         
         #adding to DB
+        new_transaction = models.Transaction(**df_to_dict[0])
+        db.add(new_transaction)
+        db.commit()
+        db.refresh(new_transaction)
 
 
         
-    return None
+    return new_transaction
 
 
 
