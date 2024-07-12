@@ -5,17 +5,17 @@ from .. csv_handler import CSVHandler
 from .. database import get_sql_db
 import app.schemas as schemas
 import app.models as models
+from app.transaction_service import TransactionService
 
 router = APIRouter(tags=["db_operations"], prefix="/transactions")
 
 #TODO: check ruff
-"""Revised Plan
-Load and Clean CSV: Load the CSV file and process it.
-Rename Columns: Rename the DataFrame columns to match the SQLAlchemy model attributes.
-Convert DataFrame to Dictionary: Convert the DataFrame to a list of dictionaries.
-Create and Add Transactions: Iterate over the dictionaries, create Transaction model instances, and add them to the database."""
 
-@router.post("/add_csv",response_model=schemas.ReturnedTransaction, status_code=status.HTTP_201_CREATED)
+
+
+
+
+@router.post("/add_csv", status_code=status.HTTP_201_CREATED)
 def add_csv(db: Session = Depends(get_sql_db)):
         
 
@@ -35,22 +35,23 @@ def add_csv(db: Session = Depends(get_sql_db)):
         print(f"Type of new_df: {type(new_df)}")
         print(new_df.head())
     
-
         try:
             df_to_dict = new_df.to_dict(orient='index')
             print(df_to_dict[0])
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error converting DataFrame to dict: {str(e)}")
         
-        #adding to DB
-        new_transaction = models.Transaction(**df_to_dict[0])
-        db.add(new_transaction)
-        db.commit()
-        db.refresh(new_transaction)
+        transaction_service = TransactionService(db)
+        new_transactions =  transaction_service.add_transactions(list(df_to_dict.values()))
+        ids = [transaction.id for transaction in new_transactions]
 
+        return {
+               "status": "success",
+               "records_processed:": len(df_to_dict)
+        }
 
         
-    return new_transaction
+    return f'Added properly!!!'
 
 
 

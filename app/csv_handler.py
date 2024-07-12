@@ -62,36 +62,14 @@ class CSVHandler:
     
     def change_date_type(self, last_df):
         try:
-            # print("Before date conversion:")
-            # print(f"Type of 'date' column before conversion: {last_df['date'].dtype}")
-            # print(f"Type of 'date' column before conversion: {type(last_df['date'][0])}")
-            # print(last_df.head(4))
 
-            # Attempt to convert 'date' column to datetime
             last_df.loc[:, 'date'] = pd.to_datetime(last_df['date'], format='%d.%m.%Y', errors='coerce')
-
-            #Ensure column type
             last_df['date'] = last_df['date'].astype('datetime64[ns]')
-
-            # # Print the DataFrame and type after conversion attempt
-            # print("After conversion attempt:")
-            # print(last_df.head(4))
-            # print(f"Type of 'date' column after conversion attempt: {last_df['date'].dtype}")
-            # print(f"Type of first element in 'date' column after conversion attempt: {type(last_df['date'][0])}")
 
             if last_df['date'].isna().any():
                 print("Some dates could not be converted and are set to NaT")
 
             last_df.loc[:, 'date'] = last_df['date'].dt.strftime('%Y-%m-%d')
-
-            # print("After date conversion:")
-            # print(last_df.head(4))
-            # print(f"Type of 'date' column after formatting: {last_df['date'].dtype}")
-            # print(f"Type of first element in 'date' column after formatting: {type(last_df['date'][0])}")
-
-
-
-            #Changing amount column type
             last_df['amount'] = last_df['amount'].str.replace(',', '.').str.replace(' ', '').astype(float)
 
 
