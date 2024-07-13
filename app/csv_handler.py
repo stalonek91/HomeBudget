@@ -12,14 +12,16 @@ class CSVHandler:
             'Nadawca / Odbiorca',
             'Tytułem', 'Kwota operacji',
             'Typ operacji',
-            'Kategoria']
+            'Kategoria',
+            'Numer referencyjny']
         
         self.new_column_names = ['date',
                                 'receiver',
                                 'title',
                                 'amount', 
                                 'transaction_type',
-                                'category']
+                                'category',
+                                'ref_number']
 
     def load_csv(self):
         try:
@@ -53,14 +55,14 @@ class CSVHandler:
         try:
             columns_dict = dict(zip(self.columns_to_keep, self.new_column_names))
             last_df.rename(columns=columns_dict, inplace=True)
-            last_df = self.change_date_type(last_df)
+            last_df = self.clean_and_format_df(last_df)
         except Exception as e:
                 print(f'Error occurred: {str(e)}')
                 return None
         return last_df
     
     
-    def change_date_type(self, last_df):
+    def clean_and_format_df(self, last_df):
         try:
 
             last_df.loc[:, 'date'] = pd.to_datetime(last_df['date'], format='%d.%m.%Y', errors='coerce')
@@ -71,6 +73,24 @@ class CSVHandler:
 
             last_df.loc[:, 'date'] = last_df['date'].dt.strftime('%Y-%m-%d')
             last_df['amount'] = last_df['amount'].str.replace(',', '.').str.replace(' ', '').astype(float)
+
+
+            if not last_df['ref_number'].is_unique:
+                duplicate_values = last_df['ref_number'][last_df['ref_number'].duplicated()].unique()
+                raise ValueError(f"The column ref_number contains duplicate values: {duplicate_values}")
+
+            return last_df
+        
+        except Exception as e:
+            print(f'Error occurred: {str(e)}')
+            return None
+
+            
+
+            
+
+        
+
 
 
 

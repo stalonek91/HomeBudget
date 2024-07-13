@@ -15,5 +15,6 @@ class Transaction(base):
     amount = Column(Numeric(10, 2), nullable=False)
     transaction_type = Column(String(100), nullable=False)
     category = Column(String(100), nullable=False)
+    ref_number = Column(String(100), nullable=False, unique=True)
 
     

@@ -5,6 +5,9 @@ class TransactionService:
     def __init__(self, db: Session) -> None:
         self.db = db
 
+    #Creating function to check if that entry already exists in db
+
+
     def add_transactions(self, transaction_data: list[dict]) -> models.Transaction:
         new_transactions = [models.Transaction(**data) for data in transaction_data]
         self.db.add_all(new_transactions)

@@ -27,6 +27,7 @@ class UpdateTransactionSchema(BaseModel):
     amount: Optional[float] = None
     transaction_type: Optional[str] = None
     category: Optional[str] = None
+    ref_number: Optional[str] = None
 
     class Config:
         orm_mode = True
@@ -37,21 +38,11 @@ class ReturnedTransaction(BaseModel):
     title: str
     amount: float
     category: str
+    ref_number: str
 
     class Config:
         orm_mode = True
 
-
-class AddTransaction(BaseModel):
-        date: date
-        receiver: str
-        title: str
-        amount: float
-        transaction_type: str
-        category: str
-
-        class Config:
-             orm_mode = True
 
 class ReturnSummary(BaseModel):
         income: float
