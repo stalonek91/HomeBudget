@@ -52,3 +52,8 @@ class AddTransaction(BaseModel):
 
         class Config:
              orm_mode = True
+
+class ReturnSummary(BaseModel):
+        income: float
+        expenses: float
+

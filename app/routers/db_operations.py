@@ -1,4 +1,5 @@
 from fastapi import status, Depends, Body, HTTPException, Request, APIRouter
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from typing import List
 from .. csv_handler import CSVHandler
@@ -10,7 +11,27 @@ from app.transaction_service import TransactionService
 router = APIRouter(tags=["db_operations"], prefix="/transactions")
 
 #TODO: check ruff
+#TODO: create mechanism to prevent adding twice same CSV (based on already existing data)
 
+
+@router.get("/get_summary", response_model=schemas.ReturnSummary, status_code=status.HTTP_200_OK)
+def get_summary(db: Session = Depends(get_sql_db)):
+    income = db.query(func.sum(models.Transaction.amount)).filter(
+            models.Transaction.amount > 0).scalar()
+    print(type(income))
+    
+    expenses = db.query(func.sum(models.Transaction.amount)).filter(
+            models.Transaction.amount <0).scalar()
+
+    income_float = float(income) if income is not None else 0.0
+    expenses_float = float(expenses) if expenses is  not None else 0.0
+
+    response = {
+           "income": income_float,
+           "expenses": expenses_float
+    }
+
+    return response
 
 
 
