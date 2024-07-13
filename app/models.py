@@ -17,4 +17,14 @@ class Transaction(base):
     category = Column(String(100), nullable=False)
     ref_number = Column(String(100), nullable=False, unique=True)
 
-    
+
+class Etoro(base):
+
+    __tablename__ = "etoro"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, nullable=False)
+    initial_amount = Column(Numeric(10, 2), nullable=False)
+    deposit_amount = Column(Numeric(10, 2), nullable=False)
+    total_amount = Column(Numeric(10, 2), nullable=False)
+    growth_percentage = Column(Numeric(5, 2), nullable=True)

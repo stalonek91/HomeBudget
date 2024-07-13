@@ -12,6 +12,28 @@ router = APIRouter(tags=["db_operations"], prefix="/transactions")
 
 #TODO: check ruff
 #TODO: create mechanism to prevent adding twice same CSV (based on already existing data)
+#TODO: new tables for other portfolio with monthly deposits
+
+
+
+@router.post("/add_etoro_transaction", response_model=schemas.EtoroSchema, status_code=status.HTTP_201_CREATED)
+def add_etoro_transaction(etoro: schemas.EtoroSchema, db: Session = Depends(get_sql_db)):
+    initial_total = etoro.initial_amount + etoro.deposit_amount
+    growth_percentage = ((etoro.total_amount - etoro.initial_amount) / initial_total) * 100
+
+    etoro_entry = models.Etoro(
+            **etoro.model_dump()
+    )
+
+    db.add(etoro_entry)
+    db.commit()
+    db.refresh(etoro_entry)
+
+    return etoro_entry
+
+
+
+
 
 
 @router.get("/get_summary", response_model=schemas.ReturnSummary, status_code=status.HTTP_200_OK)

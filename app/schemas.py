@@ -3,6 +3,18 @@ from datetime import date
 from typing import Optional
 
 
+
+class EtoroSchema(BaseModel):
+    id: Optional[int] = None
+    date: date
+    initial_amount: float
+    deposit_amount: float
+    total_amount: float
+    growth_percentage: Optional[float] = None
+
+    class Config:
+        orm_mode = True
+
 #Schema for transaction table operation
 class TransactionSchema(BaseModel):
     
