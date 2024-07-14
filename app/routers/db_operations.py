@@ -13,6 +13,30 @@ router = APIRouter(tags=["db_operations"], prefix="/transactions")
 #TODO: check ruff
 #TODO: create mechanism to prevent adding twice same CSV (based on already existing data)
 #TODO: new tables for other portfolio with monthly deposits
+    # ongoing - Etoro
+    # tbi -> revolut, vienna, obligacje, xtb, generali, 
+#TODO: check if TransactionService class needs to be redesigned to handle all table multiply operations addition
+
+
+#route for adding multiply transactions
+@router.post("/add_many_etoro", status_code=status.HTTP_201_CREATED)
+def add_many_etoro(etoro_entries: List[schemas.EtoroSchema] ,db: Session = Depends(get_sql_db)):
+
+
+       
+    for entity in etoro_entries:
+            initial_total = entity.initial_amount + entity.deposit_amount
+            entity.growth_percentage = ((entity.total_amount - (entity.initial_amount + entity.deposit_amount)) / initial_total) * 100
+
+    
+
+
+    return None
+       
+    
+       
+       
+
 
 
 
