@@ -3,7 +3,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 from typing import List
 from .. csv_handler import CSVHandler
-from .. database import get_sql_db
+from app.database import get_sql_db
 import app.schemas as schemas
 import app.models as models
 from app.transaction_service import TransactionService
@@ -14,32 +14,30 @@ router = APIRouter(tags=["db_operations"], prefix="/transactions")
 #TODO: create mechanism to prevent adding twice same CSV (based on already existing data)
 #TODO: new tables for other portfolio with monthly deposits
     # ongoing - Etoro
-    # tbi -> revolut, vienna, obligacje, xtb, generali, 
+    # tbi -> revolut, vienna, obligacje, xtb, generali, akcje_nokii
 #TODO: check if TransactionService class needs to be redesigned to handle all table multiply operations addition
 
 
 #route for adding multiply transactions
 @router.post("/add_many_etoro", status_code=status.HTTP_201_CREATED)
 def add_many_etoro(etoro_entries: List[schemas.EtoroSchema] ,db: Session = Depends(get_sql_db)):
+    transaction_service = TransactionService(db)
 
-
-       
+    etoro_dicts = []
     for entity in etoro_entries:
             initial_total = entity.initial_amount + entity.deposit_amount
             entity.growth_percentage = ((entity.total_amount - (entity.initial_amount + entity.deposit_amount)) / initial_total) * 100
-
+            etoro_dict = entity.model_dump()
+            etoro_dicts.append(etoro_dict)
+            
     
+    transaction_service.add_transactions(models.Etoro, etoro_dicts)
 
-
-    return None
+    return {"status": "success", "message": "Transactions added successfully."}
        
     
        
-       
-
-
-
-
+    
 @router.post("/add_etoro_transaction", response_model=schemas.EtoroSchema, status_code=status.HTTP_201_CREATED)
 def add_etoro_transaction(etoro: schemas.EtoroSchema, db: Session = Depends(get_sql_db)):
     initial_total = etoro.initial_amount + etoro.deposit_amount

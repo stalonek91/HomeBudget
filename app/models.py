@@ -1,10 +1,10 @@
-from app.database import base
+from app.database import Base
 
 from sqlalchemy.sql.expression import text
 from sqlalchemy import Column, Integer, Text, String, Boolean, DateTime, Date, Numeric
 
 
-class Transaction(base):
+class Transaction(Base):
 
     __tablename__ = "transactions"
 
@@ -18,7 +18,7 @@ class Transaction(base):
     ref_number = Column(String(100), nullable=False, unique=True)
 
 
-class Etoro(base):
+class Etoro(Base):
 
     __tablename__ = "etoro"
 

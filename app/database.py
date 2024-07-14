@@ -1,13 +1,13 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-import os
+
 
 SQLALCHEMY_DATABASE_URL = "postgresql://sylwestersojka:123@localhost/homebudget_db"
 
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-base = declarative_base()
+Base = declarative_base()
 
 def get_sql_db():
     conn = SessionLocal()
