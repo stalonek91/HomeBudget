@@ -19,11 +19,12 @@ router = APIRouter(tags=["db_operations"], prefix="/transactions")
 @router.post("/add_etoro_transaction", response_model=schemas.EtoroSchema, status_code=status.HTTP_201_CREATED)
 def add_etoro_transaction(etoro: schemas.EtoroSchema, db: Session = Depends(get_sql_db)):
     initial_total = etoro.initial_amount + etoro.deposit_amount
-    growth_percentage = ((etoro.total_amount - etoro.initial_amount) / initial_total) * 100
+    growth_percentage = ((etoro.total_amount - (etoro.initial_amount + etoro.deposit_amount)) / initial_total) * 100
 
     etoro_entry = models.Etoro(
             **etoro.model_dump()
     )
+    etoro_entry.growth_percentage = growth_percentage
 
     db.add(etoro_entry)
     db.commit()
