@@ -15,8 +15,8 @@ router = APIRouter(tags=["db_operations"], prefix="/transactions")
 #TODO: new tables for other portfolio with monthly deposits
     # tbi -> revolut, vienna, obligacje, generali, akcje_nokii
 
-@router.put("/update_etoro/{id}", response_model=schemas.EtoroSchema, status_code=status.HTTP_202_ACCEPTED)
-def update_etoro(id: int, etoro_body: schemas.UpdateEtoroSchema = Body(...), db: Session = Depends(get_sql_db)):
+@router.put("/update_etoro/{id}", response_model=schemas.PortfolioTransaction, status_code=status.HTTP_202_ACCEPTED)
+def update_etoro(id: int, etoro_body: schemas.UpdatePortfolioTransaction = Body(...), db: Session = Depends(get_sql_db)):
     print(f'FUNCTION:PUT: /update_etoro/{id} ')
     transaction_service = TransactionService(db)
 
@@ -29,19 +29,19 @@ def update_etoro(id: int, etoro_body: schemas.UpdateEtoroSchema = Body(...), db:
        
        
 
-@router.get("/get_all_etoro", response_model=List[schemas.EtoroSchema], status_code=status.HTTP_200_OK)
+@router.get("/get_all_etoro", response_model=List[schemas.PortfolioTransaction], status_code=status.HTTP_200_OK)
 def get_all_etoro(db: Session = Depends(get_sql_db)):
         etoro_entries = db.query(models.Etoro).all()
         return etoro_entries
 
-@router.get("/get_id_etoro/{id}", response_model=schemas.EtoroSchema, status_code=status.HTTP_200_OK)
+@router.get("/get_id_etoro/{id}", response_model=schemas.PortfolioTransaction, status_code=status.HTTP_200_OK)
 def get_all_etoro(id: int, db: Session = Depends(get_sql_db)):
         id_etoro = db.query(models.Etoro).filter(models.Etoro.id == id).first()
         return id_etoro
 
 
 @router.post("/add_many_etoro", status_code=status.HTTP_201_CREATED)
-def add_many_etoro(etoro_entries: List[schemas.EtoroSchema] ,db: Session = Depends(get_sql_db)):
+def add_many_etoro(etoro_entries: List[schemas.PortfolioTransaction] ,db: Session = Depends(get_sql_db)):
     transaction_service = TransactionService(db)
 
     etoro_dicts = []
@@ -59,8 +59,8 @@ def add_many_etoro(etoro_entries: List[schemas.EtoroSchema] ,db: Session = Depen
     
        
     
-@router.post("/add_etoro_transaction", response_model=schemas.EtoroSchema, status_code=status.HTTP_201_CREATED)
-def add_etoro_transaction(etoro: schemas.EtoroSchema, db: Session = Depends(get_sql_db)):
+@router.post("/add_etoro_transaction", response_model=schemas.PortfolioTransaction, status_code=status.HTTP_201_CREATED)
+def add_etoro_transaction(etoro: schemas.PortfolioTransaction, db: Session = Depends(get_sql_db)):
     initial_total = etoro.initial_amount + etoro.deposit_amount
     growth_percentage = ((etoro.total_amount - (etoro.initial_amount + etoro.deposit_amount)) / initial_total) * 100
 

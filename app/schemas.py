@@ -2,31 +2,8 @@ from pydantic import BaseModel
 from datetime import date
 from typing import Optional
 
+class UpdatePortfolioTransaction(BaseModel):
 
-class XTBschema(BaseModel):
-    id: Optional[int] = None
-    date: date
-    initial_amount: float
-    deposit_amount: float
-    total_amount: float
-    growth_percentage: Optional[float] = None
-
-    class Config:
-        orm_mode = True
-
-
-class EtoroSchema(BaseModel):
-    id: Optional[int] = None
-    date: date
-    initial_amount: float
-    deposit_amount: float
-    total_amount: float
-    growth_percentage: Optional[float] = None
-
-    class Config:
-        orm_mode = True
-
-class UpdateEtoroSchema(BaseModel):
     id: Optional[int] = None
     date: Optional[date]
     initial_amount: Optional[float]
@@ -34,8 +11,20 @@ class UpdateEtoroSchema(BaseModel):
     total_amount: Optional[float]
     growth_percentage: Optional[float] = None
 
+class PortfolioTransaction(BaseModel):
+
+    id: Optional[int] = None
+    date: date
+    initial_amount: float
+    deposit_amount: float
+    total_amount: float
+    growth_percentage: Optional[float] = None
+
     class Config:
         orm_mode = True
+
+
+
 
 #Schema for transaction table operation
 class TransactionSchema(BaseModel):
