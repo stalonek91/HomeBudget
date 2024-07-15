@@ -13,12 +13,33 @@ router = APIRouter(tags=["db_operations"], prefix="/transactions")
 #TODO: check ruff
 #TODO: create mechanism to prevent adding twice same CSV (based on already existing data)
 #TODO: new tables for other portfolio with monthly deposits
-    # ongoing - Etoro
-    # tbi -> revolut, vienna, obligacje, xtb, generali, akcje_nokii
-#TODO: check if TransactionService class needs to be redesigned to handle all table multiply operations addition
+    # tbi -> revolut, vienna, obligacje, generali, akcje_nokii
+
+@router.put("/update_etoro/{id}", response_model=schemas.EtoroSchema, status_code=status.HTTP_202_ACCEPTED)
+def update_etoro(id: int, etoro_body: schemas.UpdateEtoroSchema = Body(...), db: Session = Depends(get_sql_db)):
+    print(f'FUNCTION:PUT: /update_etoro/{id} ')
+    transaction_service = TransactionService(db)
+
+    update_data = etoro_body.model_dump(exclude_unset=True)
+    update_data.pop("id", None)
+
+    updated_transaction = transaction_service.update_transaction(model_class=models.Etoro, id=id, transaction_data=update_data)
+    
+    return updated_transaction
+       
+       
+
+@router.get("/get_all_etoro", response_model=List[schemas.EtoroSchema], status_code=status.HTTP_200_OK)
+def get_all_etoro(db: Session = Depends(get_sql_db)):
+        etoro_entries = db.query(models.Etoro).all()
+        return etoro_entries
+
+@router.get("/get_id_etoro/{id}", response_model=schemas.EtoroSchema, status_code=status.HTTP_200_OK)
+def get_all_etoro(id: int, db: Session = Depends(get_sql_db)):
+        id_etoro = db.query(models.Etoro).filter(models.Etoro.id == id).first()
+        return id_etoro
 
 
-#route for adding multiply transactions
 @router.post("/add_many_etoro", status_code=status.HTTP_201_CREATED)
 def add_many_etoro(etoro_entries: List[schemas.EtoroSchema] ,db: Session = Depends(get_sql_db)):
     transaction_service = TransactionService(db)

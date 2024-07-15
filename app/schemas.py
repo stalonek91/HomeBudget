@@ -3,6 +3,17 @@ from datetime import date
 from typing import Optional
 
 
+class XTBschema(BaseModel):
+    id: Optional[int] = None
+    date: date
+    initial_amount: float
+    deposit_amount: float
+    total_amount: float
+    growth_percentage: Optional[float] = None
+
+    class Config:
+        orm_mode = True
+
 
 class EtoroSchema(BaseModel):
     id: Optional[int] = None
@@ -10,6 +21,17 @@ class EtoroSchema(BaseModel):
     initial_amount: float
     deposit_amount: float
     total_amount: float
+    growth_percentage: Optional[float] = None
+
+    class Config:
+        orm_mode = True
+
+class UpdateEtoroSchema(BaseModel):
+    id: Optional[int] = None
+    date: Optional[date]
+    initial_amount: Optional[float]
+    deposit_amount: Optional[float]
+    total_amount: Optional[float]
     growth_percentage: Optional[float] = None
 
     class Config:
