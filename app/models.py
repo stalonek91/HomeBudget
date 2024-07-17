@@ -51,3 +51,25 @@ class Vienna(Base):
     deposit_amount = Column(Numeric(10, 2), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
     growth_percentage = Column(Numeric(5, 2), nullable=True)
+
+class Revolut(Base):
+
+    __tablename__ = "revolut"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, nullable=False)
+    initial_amount = Column(Numeric(10, 2), nullable=False)
+    deposit_amount = Column(Numeric(10, 2), nullable=False)
+    total_amount = Column(Numeric(10, 2), nullable=False)
+    growth_percentage = Column(Numeric(5, 2), nullable=True)
+
+class Obligacje(Base):
+
+    __tablename__ = "obligacje"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, nullable=False)
+    initial_amount = Column(Numeric(10, 2), nullable=False)
+    deposit_amount = Column(Numeric(10, 2), nullable=False)
+    total_amount = Column(Numeric(10, 2), nullable=False)
+    growth_percentage = Column(Numeric(5, 2), nullable=True)
