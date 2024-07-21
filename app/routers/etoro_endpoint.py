@@ -11,8 +11,7 @@ from app.transaction_service import TransactionService
 router = APIRouter(tags=["db_operations"], prefix="/transactions")
 
 #TODO: check ruff
-#TODO: new tables for other portfolio with monthly deposits
-    # tbi -> , , , generali, akcje_nokii
+
 
 @router.put("/update_etoro/{id}", response_model=schemas.PortfolioTransaction, status_code=status.HTTP_202_ACCEPTED)
 def update_etoro(id: int, etoro_body: schemas.UpdatePortfolioTransaction = Body(...), db: Session = Depends(get_sql_db)):

@@ -71,3 +71,14 @@ class ReturnSummary(BaseModel):
         income: float
         expenses: float
 
+class PortfolioSummarySchema(BaseModel):
+    id: Optional[int] = None
+    date: date
+    sum_of_acc: float
+    last_update_profit: float
+    sum_of_deposits: float
+    all_time_profit: float
+
+    class Config:
+        orm_mode = True
+

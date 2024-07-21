@@ -101,10 +101,11 @@ class Nokia(Base):
 class PortfolioSummary(Base):
     
     __tablename__ = "portfolio"
+    
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date, nullable=False)
     sum_of_acc = Column(Numeric(10, 2), nullable=False)
-    #last_update_change = float?
-    #sum_of_deposits
-    #all time profits loss
+    last_update_profit = Column(Numeric(10, 2), nullable=False)
+    sum_of_deposits = Column(Numeric(10, 2), nullable=False)
+    all_time_profit = Column(Numeric(10, 2), nullable=False)
     
