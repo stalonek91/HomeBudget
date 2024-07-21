@@ -11,7 +11,6 @@ from app.transaction_service import TransactionService
 router = APIRouter(tags=["db_operations"], prefix="/transactions")
 
 #TODO: check ruff
-#TODO: create mechanism to prevent adding twice same CSV (based on already existing data)
 #TODO: new tables for other portfolio with monthly deposits
     # tbi -> revolut, vienna, obligacje, generali, akcje_nokii
 

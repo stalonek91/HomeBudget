@@ -71,3 +71,24 @@ def add_obligacje_transaction(obligacje: schemas.PortfolioTransaction, db: Sessi
     db.refresh(obligacje_entry)
 
     return obligacje_entry
+
+
+@router.delete("/delete_obligacja/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_obligacja(id: int, db: Session = Depends(get_sql_db)):
+    get_obl_id = db.query(models.Obligacje).filter(models.Obligacje.id == id)
+    obligacja = get_obl_id.first()
+
+    if obligacja is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Obligacja with id: {id} has not been found')
+      
+    try:
+        db.delete(obligacja)
+        db.commit()
+        return None
+        
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'There has been a problem with deleting from DB: {str(e)}')
+
+        
+        
+      
