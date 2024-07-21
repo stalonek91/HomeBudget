@@ -19,21 +19,21 @@ def update_portfolio(id: int, portfolio_body: schemas.UpdatePortfolioTransaction
     update_data = portfolio_body.model_dump(exclude_unset=True)
     update_data.pop("id", None)
 
-    updated_transaction = transaction_service.update_transaction(model_class=models.Portfolio, id=id, transaction_data=update_data)
+    updated_transaction = transaction_service.update_transaction(model_class=models.PortfolioSummary, id=id, transaction_data=update_data)
     
     return updated_transaction
        
        
 
-@router.get("/get_all_portfolio", response_model=List[schemas.PortfolioTransaction], status_code=status.HTTP_200_OK)
+@router.get("/get_all_portfolio", response_model=List[schemas.PortfolioSummarySchema], status_code=status.HTTP_200_OK)
 def get_all_portfolio(db: Session = Depends(get_sql_db)):
-        portfolio_entries = db.query(models.Portfolio).all()
+        portfolio_entries = db.query(models.PortfolioSummary).all()
         print(portfolio_entries)
         return portfolio_entries
 
-@router.get("/get_id_portfolio/{id}", response_model=schemas.PortfolioTransaction, status_code=status.HTTP_200_OK)
+@router.get("/get_id_portfolio/{id}", response_model=schemas.PortfolioSummarySchema, status_code=status.HTTP_200_OK)
 def get_all_portfolio(id: int, db: Session = Depends(get_sql_db)):
-        id_portfolio = db.query(models.Portfolio).filter(models.Portfolio.id == id).first()
+        id_portfolio = db.query(models.PortfolioSummary).filter(models.PortfolioSummary.id == id).first()
         return id_portfolio
 
 
@@ -43,7 +43,7 @@ def get_all_portfolio(id: int, db: Session = Depends(get_sql_db)):
 # columns from each table with total amount
 #'total_amount'
 
-@router.get("/generate_summary", status_code=status.HTTP_201_CREATED)
+@router.post("/generate_summary",response_model=schemas.PortfolioSummarySchema, status_code=status.HTTP_201_CREATED)
 def generate_summary(db: Session = Depends(get_sql_db)):
      
     model_classes = {
@@ -56,11 +56,25 @@ def generate_summary(db: Session = Depends(get_sql_db)):
         'Nokia': models.Nokia
     }
     list_of_totals = []
+    
 
     for model_name, model_class in model_classes.items():
          total = db.query(model_class.total_amount).order_by(desc(model_class.date)).first()
          if total:
               list_of_totals.append(total[0])
+
+    sum_of_totals = sum(list_of_totals)
+    transaction_data = {    
+        'date': '2024-07-21',
+        'sum_of_acc': sum_of_totals,
+        'last_update_profit': 0,
+        'sum_of_deposits': 0,
+        'all_time_profit': 0}
+
+    transaction = TransactionService(db)
+    add_summary = transaction.add_transaction(model_class=models.PortfolioSummary, transaction_data=transaction_data)
+
+
 
         
     print(sum(list_of_totals))
@@ -71,7 +85,7 @@ def generate_summary(db: Session = Depends(get_sql_db)):
 
 @router.delete("/delete_portfolio/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_oportfolio(id: int, db: Session = Depends(get_sql_db)):
-    get_obl_id = db.query(models.Portfolio).filter(models.Portfolio.id == id)
+    get_obl_id = db.query(models.PortfolioSummary).filter(models.PortfolioSummary.id == id)
     portfolio = get_obl_id.first()
 
     if portfolio is None:
