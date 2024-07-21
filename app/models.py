@@ -73,3 +73,38 @@ class Obligacje(Base):
     deposit_amount = Column(Numeric(10, 2), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
     growth_percentage = Column(Numeric(5, 2), nullable=True)
+
+
+class Generali(Base):
+
+    __tablename__ = "generali"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, nullable=False)
+    initial_amount = Column(Numeric(10, 2), nullable=False)
+    deposit_amount = Column(Numeric(10, 2), nullable=False)
+    total_amount = Column(Numeric(10, 2), nullable=False)
+    growth_percentage = Column(Numeric(5, 2), nullable=True)
+
+class Nokia(Base):
+
+    __tablename__ = "nokia"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, nullable=False)
+    initial_amount = Column(Numeric(10, 2), nullable=False)
+    deposit_amount = Column(Numeric(10, 2), nullable=False)
+    total_amount = Column(Numeric(10, 2), nullable=False)
+    growth_percentage = Column(Numeric(5, 2), nullable=True)
+
+
+class PortfolioSummary(Base):
+    
+    __tablename__ = "portfolio"
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, nullable=False)
+    sum_of_acc = Column(Numeric(10, 2), nullable=False)
+    #last_update_change = float?
+    #sum_of_deposits
+    #all time profits loss
+    
