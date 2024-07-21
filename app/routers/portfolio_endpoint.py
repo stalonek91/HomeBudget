@@ -1,5 +1,5 @@
 from fastapi import status, Depends, Body, HTTPException, Request, APIRouter
-from sqlalchemy import func
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
 from typing import List
 from .. csv_handler import CSVHandler
@@ -43,7 +43,28 @@ def get_all_portfolio(id: int, db: Session = Depends(get_sql_db)):
 # columns from each table with total amount
 #'total_amount'
 
+@router.get("/generate_summary", status_code=status.HTTP_201_CREATED)
+def generate_summary(db: Session = Depends(get_sql_db)):
+     
+    model_classes = {
+        'Etoro': models.Etoro,
+        'Xtb': models.Xtb,
+        'Vienna': models.Vienna,
+        'Revolut': models.Revolut,
+        'Obligacje': models.Obligacje,
+        'Generali': models.Generali,
+        'Nokia': models.Nokia
+    }
+    list_of_totals = []
 
+    for model_name, model_class in model_classes.items():
+         total = db.query(model_class.total_amount).order_by(desc(model_class.date)).first()
+         if total:
+              list_of_totals.append(total[0])
+
+        
+    print(sum(list_of_totals))
+    return list_of_totals
 
 
 
