@@ -35,8 +35,17 @@ def main():
         st.warning("No data to display")
 
     if portfolio_percentage:
+        fig, ax = plt.subplots(figsize=(6,3), subplot_kw=dict(aspect="equal"))
         df_perc = pd.DataFrame(portfolio_percentage)
         st.write(df_perc)
+
+        fig, ax = plt.subplots()
+        ax.pie(df_perc['Percentage'], labels=df_perc['Wallet'], autopct='%1.1f%%', startangle=90)
+        ax.axis('equal')
+        st.pyplot(fig)
+
+
+
 
 if __name__ == "__main__":
     main()
