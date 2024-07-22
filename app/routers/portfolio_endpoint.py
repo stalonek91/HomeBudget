@@ -1,5 +1,5 @@
 from fastapi import status, Depends, Body, HTTPException, Request, APIRouter
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from sqlalchemy.orm import Session
 from typing import List
 from .. csv_handler import CSVHandler
@@ -7,9 +7,42 @@ from app.database import get_sql_db
 import app.schemas as schemas
 import app.models as models
 from app.transaction_service import TransactionService
+import pandas as pd
 
 router = APIRouter(tags=["portfolio_endpoints"], prefix="/portfolio")
 
+model_classes = {
+    'Etoro': models.Etoro,
+    'Xtb': models.Xtb,
+    'Vienna': models.Vienna,
+    'Revolut': models.Revolut,
+    'Obligacje': models.Obligacje,
+    'Generali': models.Generali,
+    'Nokia': models.Nokia
+}
+
+#TODO: Implementing % of total portfolio
+
+@router.get("/calculate_perc/", status_code=status.HTTP_200_OK)
+def calculate_perc(db: Session = Depends(get_sql_db), model_classes=model_classes):
+     
+    wallet_totals = {}
+    total_portfolio_amount = 0.0
+
+    for wallet_name, wallet_model in model_classes.items():
+          total_amount = db.query(func.sum(wallet_model.total_amount)).scalar() or 0
+          total_amount = float(total_amount)
+          wallet_totals[wallet_name] = total_amount
+          total_portfolio_amount += total_amount
+     
+    wallet_percentages = {wallet:(amount / total_portfolio_amount) * 100 for wallet, amount in wallet_totals.items()}
+
+    df = pd.DataFrame(list(wallet_percentages.items()), columns=['Wallet', 'Percentage'])
+    df['Percentage'] = df['Percentage'].round(2)
+
+    print(df)
+
+    return df.to_dict(orient='records')
 
 @router.put("/update_portfolio/{id}", response_model=schemas.PortfolioTransaction, status_code=status.HTTP_202_ACCEPTED)
 def update_portfolio(id: int, portfolio_body: schemas.UpdatePortfolioTransaction = Body(...), db: Session = Depends(get_sql_db)):
@@ -44,17 +77,8 @@ def get_all_portfolio(id: int, db: Session = Depends(get_sql_db)):
 #'total_amount'
 
 @router.post("/generate_summary",response_model=schemas.PortfolioSummarySchema, status_code=status.HTTP_201_CREATED)
-def generate_summary(db: Session = Depends(get_sql_db)):
+def generate_summary(db: Session = Depends(get_sql_db), model_classes = model_classes):
      
-    model_classes = {
-        'Etoro': models.Etoro,
-        'Xtb': models.Xtb,
-        'Vienna': models.Vienna,
-        'Revolut': models.Revolut,
-        'Obligacje': models.Obligacje,
-        'Generali': models.Generali,
-        'Nokia': models.Nokia
-    }
     list_of_totals = []
     
 
@@ -74,9 +98,6 @@ def generate_summary(db: Session = Depends(get_sql_db)):
     transaction = TransactionService(db)
     add_summary = transaction.add_transaction(model_class=models.PortfolioSummary, transaction_data=transaction_data)
 
-
-
-        
     print(sum(list_of_totals))
     return list_of_totals
 

@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
 
 FASTAPI_URL = 'http://127.0.0.1:8000'
 
@@ -11,17 +13,30 @@ def fetch_portfolio_summary():
     else:
         st.error(f"Failed to fetch data: {response.status_code}")
         return []
+    
+def get_portfolio_perc():
+    response = requests.get(f"{FASTAPI_URL}/portfolio/calculate_perc/")
+    if response.status_code == 200:
+        return response.json()
+    else:
+        st.error(f"Failed to fetch response data: {response.status_code}")
+        return []
 
 def main():
-    st.title("Portfolio Summary")
+    st.title("Portfolio :blue[Summary] 🤫🤫🤫🤫🤫🤫")
 
     portfolio_summary = fetch_portfolio_summary()
+    portfolio_percentage = get_portfolio_perc()
 
     if portfolio_summary:
         df = pd.DataFrame(portfolio_summary)
         st.dataframe(df)
     else:
         st.warning("No data to display")
+
+    if portfolio_percentage:
+        df_perc = pd.DataFrame(portfolio_percentage)
+        st.write(df_perc)
 
 if __name__ == "__main__":
     main()
