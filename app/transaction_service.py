@@ -3,6 +3,7 @@ from app import models
 from typing import Type, List, Dict, Any, TypeVar
 from app.database import Base
 from fastapi import HTTPException, status
+import pandas as pd
 
 
 SQLAlchemyModel = TypeVar('SQLAlchemyModel', bound=Base)
@@ -11,6 +12,17 @@ class TransactionService:
     def __init__(self, db: Session) -> None:
         self.db = db
 
+#TODO: test this function
+    def create_df_from_table(self, db: Session,  model_class: Type[SQLAlchemyModel]) -> pd.DataFrame:
+        query = db.query(model_class).all()
+        data = [row.__dict__ for row in query]
+
+        for item in data:
+            item.pop('_sa_instance_state', None)
+
+        df = pd.DataFrame(data)
+        print(df)
+        return df    
    
     def add_transactions(self, model_class: Type[SQLAlchemyModel], transaction_data: List[Dict[str, Any]]) -> List[SQLAlchemyModel]:
         new_transactions = [model_class(**data) for data in transaction_data]

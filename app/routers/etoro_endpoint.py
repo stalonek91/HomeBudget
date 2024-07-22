@@ -12,6 +12,11 @@ router = APIRouter(tags=["db_operations"], prefix="/transactions")
 
 #TODO: check ruff
 
+@router.get("/return_df", status_code=status.HTTP_200_OK)
+def return_df(db: Session = Depends(get_sql_db)):
+      pass
+              
+
 
 @router.put("/update_etoro/{id}", response_model=schemas.PortfolioTransaction, status_code=status.HTTP_202_ACCEPTED)
 def update_etoro(id: int, etoro_body: schemas.UpdatePortfolioTransaction = Body(...), db: Session = Depends(get_sql_db)):

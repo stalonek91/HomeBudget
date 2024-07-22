@@ -34,6 +34,9 @@ def main():
     else:
         st.warning("No data to display")
 
+
+    
+
     if portfolio_percentage:
         fig, ax = plt.subplots(figsize=(6,3), subplot_kw=dict(aspect="equal"))
         df_perc = pd.DataFrame(portfolio_percentage)
@@ -44,7 +47,13 @@ def main():
         ax.axis('equal')
         st.pyplot(fig)
 
-
+        options = st.selectbox(
+        "Show wallet details",
+        df_perc,
+        index=None,
+        placeholder="Select Your wallet",
+        )
+        st.write("You selected:", options)
 
 
 if __name__ == "__main__":
