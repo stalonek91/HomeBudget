@@ -12,7 +12,7 @@ class TransactionService:
     def __init__(self, db: Session) -> None:
         self.db = db
 
-#TODO: test this function
+
     def create_df_from_table(self, db: Session,  model_class: Type[SQLAlchemyModel]) -> pd.DataFrame:
         query = db.query(model_class).all()
         data = [row.__dict__ for row in query]

@@ -27,7 +27,8 @@ def get_portfolio_perc():
     
 def add_csv_to_db(file):
 
-    response = requests.post(f"{FASTAPI_URL}/transactions/add_csv")
+    files = {"file": (file.name, file, "text/csv")}
+    response = requests.post(f"{FASTAPI_URL}/transactions/add_csv", files=files)
     if response.status_code == 201:
         return response.json()
     else:
@@ -159,32 +160,12 @@ def main():
         
 
         if uploaded_file is not None:
-            print(f'type of uploaded file is: {type(uploaded_file)}')
-            file_content = uploaded_file.getvalue().decode("utf-8")
-
-            print(f'Uploaded file is not none. Content is: \n {file_content}')
-
-            try:
-                print(f'trying to load a file via pd.read: ')
-                df = pd.read_csv(StringIO(file_content), delimiter=';')
-                print(f'File loaded with content {df.head(5)}')
-
-                csv_handler = CSVHandler(df)
-                new_df = csv_handler.load_csv()
-
-                if new_df is not None and not new_df.empty:
-                    sorted_df = df.sort_values(by='Data księgowania', ascending=True)
-                    st.write(sorted_df)
-
-                    response = add_csv_to_db(uploaded_file)
-                    st.write(response)
-
-                else:
-                    st.error("Error creating DataFrame from CSV")
-            except pd.errors.ParserError:
-                st.error("Error parsing CSV")
+            response = add_csv_to_db(uploaded_file)
+            st.success(response)
         else:
             st.info("Please upload a CSV file")
+
+
 
 
         

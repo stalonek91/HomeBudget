@@ -108,9 +108,9 @@ def add_csv(file: UploadFile = File(...), db: Session = Depends(get_sql_db)):
 
     print('Entering POST /add_csv request')
     print(('Loading CSV attempt: ...'))
+
     content = file.file.read().decode('utf-8')
     df = pd.read_csv(StringIO(content), delimiter=';')
-
 
     print(f'TOP5 rows of df: {df.head(5)}')
 
@@ -136,7 +136,7 @@ def add_csv(file: UploadFile = File(...), db: Session = Depends(get_sql_db)):
             raise HTTPException(status_code=500, detail=f"Error converting DataFrame to dict: {str(e)}")
         
         transaction_service = TransactionService(db)
-        new_transactions =  transaction_service.add_transactions(list(df_to_dict.values()))
+        new_transactions =  transaction_service.add_transactions(models.Transaction, list(df_to_dict.values()))
         ids = [transaction.id for transaction in new_transactions]
 
         return {
