@@ -32,19 +32,17 @@ def calculate_perc(db: Session = Depends(get_sql_db), model_classes=model_classe
     for wallet_name, wallet_model in model_classes.items():
           total_amount = db.query(wallet_model.total_amount).order_by(desc(wallet_model.date)).first()
           total_amount = float(total_amount[0])
-          print(f'Total amount of {wallet_name} is {total_amount}')
+
           wallet_totals[wallet_name] = total_amount
           total_portfolio_amount += total_amount
 
-          print(f'TotalPortfolio is: {total_portfolio_amount}')
+
 
 
     wallet_percentages = {wallet:(amount / total_portfolio_amount) * 100 for wallet, amount in wallet_totals.items()}
 
     df = pd.DataFrame(list(wallet_percentages.items()), columns=['Wallet', 'Percentage'])
     df['Percentage'] = df['Percentage'].round(2)
-
-    print(df)
 
     return df.to_dict(orient='records')
 

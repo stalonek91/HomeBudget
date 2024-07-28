@@ -1,4 +1,4 @@
-from fastapi import status, Depends, Body, HTTPException, Request, APIRouter
+from fastapi import status, Depends, Body, HTTPException, Request, APIRouter, UploadFile, File
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from typing import List
@@ -7,6 +7,8 @@ from app.database import get_sql_db
 import app.schemas as schemas
 import app.models as models
 from app.transaction_service import TransactionService
+import pandas as pd
+from io import StringIO
 
 router = APIRouter(tags=["db_operations"], prefix="/transactions")
 
@@ -100,13 +102,19 @@ def get_summary(db: Session = Depends(get_sql_db)):
 
 
 
-
+#FIXME: change the logic to allow file to be passed instead of path
 @router.post("/add_csv", status_code=status.HTTP_201_CREATED)
-def add_csv(db: Session = Depends(get_sql_db)):
-        
+def add_csv(file: UploadFile = File(...), db: Session = Depends(get_sql_db)):
 
-    path_to_csv = '/Users/sylwestersojka/Documents/HomeBudget/Transactions.csv'
-    csv_instance = CSVHandler(path_to_csv)
+    print('Entering POST /add_csv request')
+    print(('Loading CSV attempt: ...'))
+    content = file.file.read().decode('utf-8')
+    df = pd.read_csv(StringIO(content), delimiter=';')
+
+
+    print(f'TOP5 rows of df: {df.head(5)}')
+
+    csv_instance = CSVHandler(df)
     df = csv_instance.load_csv()
 
     if df is not None:

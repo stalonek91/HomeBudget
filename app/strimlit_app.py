@@ -4,6 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+from csv_handler import CSVHandler
+from io import StringIO
 
 FASTAPI_URL = 'http://127.0.0.1:8000'
 
@@ -22,11 +24,21 @@ def get_portfolio_perc():
     else:
         st.error(f"Failed to fetch response data: {response.status_code}")
         return []
+    
+def add_csv_to_db(file):
+
+    response = requests.post(f"{FASTAPI_URL}/transactions/add_csv")
+    if response.status_code == 201:
+        return response.json()
+    else:
+        st.error(f"Failed to process the POST request: {response.status_code}")
+        return []
 
 def main():
 
     st.sidebar.title('Navigation')
-    selection = st.sidebar.radio("Go to", ['Summary', "Transactions", "Pornosy"], index=0)
+    selection = st.sidebar.radio("Go to", ['Summary', "Transactions", "Pornosy",], index=0)
+
 
     if selection == 'Summary':
  
@@ -75,11 +87,41 @@ def main():
         
         st.line_chart(chart_data)
 
-        magia = pd.DataFrame(
-            np.random.rand(1000, 2) / [50, 50] + [37.76, -122.4],
-            columns=['lat', 'lon'])
+        latitude = 50.63678
+        longitude = 17.82635
         
-        st.map(magia)
+        magia = pd.DataFrame(
+            {
+                'lat': [latitude],
+                'lon': [longitude]
+            }
+        )
+            
+        
+        st.map(latitude=50.63678, longitude=17.82635, data=magia)
+
+
+        @st.cache_data
+        def gen_random():
+            return np.random.randn(10, 20)
+        
+        df_table = pd.DataFrame(
+            
+            gen_random(),
+            columns = ('Column %d' % i for i in range (20))
+        )
+        st.table(df_table)
+
+        x = st.slider('x')
+        st.write(x, 'squared is', x * x)
+
+        if st.checkbox('Show dataframe'):
+            chart_data = pd.DataFrame(
+                np.random.randn(5,4),
+                columns= ('Col to: %d' % i for i in range (4))
+            )
+
+            chart_data
 
     elif selection == "Pornosy":
 
@@ -110,11 +152,43 @@ def main():
             st.image('/Users/sylwestersojka/Documents/HomeBudget/app/prenk.png')
 
     elif selection == "Transactions": 
-        st.title('Giggity')
-        st.video('https://www.youtube.com/watch?v=eCVdhXbPSQE&ab_channel=WEBQ%28WhoElseButQuagmire%29')
+        st.title('Load CSV to DB')
+        print(f'1/2::: trying to upload a file')
+        uploaded_file = st.file_uploader("Choose CSV file", type="csv")
+        print(f'2/2::: Code after file uploading')
+        
 
-        x = st.slider('x')  # 👈 this is a widget
-        st.write(x, 'squared is', x * x)
+        if uploaded_file is not None:
+            print(f'type of uploaded file is: {type(uploaded_file)}')
+            file_content = uploaded_file.getvalue().decode("utf-8")
+
+            print(f'Uploaded file is not none. Content is: \n {file_content}')
+
+            try:
+                print(f'trying to load a file via pd.read: ')
+                df = pd.read_csv(StringIO(file_content), delimiter=';')
+                print(f'File loaded with content {df.head(5)}')
+
+                csv_handler = CSVHandler(df)
+                new_df = csv_handler.load_csv()
+
+                if new_df is not None and not new_df.empty:
+                    sorted_df = df.sort_values(by='Data księgowania', ascending=True)
+                    st.write(sorted_df)
+
+                    response = add_csv_to_db(uploaded_file)
+                    st.write(response)
+
+                else:
+                    st.error("Error creating DataFrame from CSV")
+            except pd.errors.ParserError:
+                st.error("Error parsing CSV")
+        else:
+            st.info("Please upload a CSV file")
+
+
+        
+
 
 if __name__ == "__main__":
     main()
