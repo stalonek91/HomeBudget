@@ -89,19 +89,19 @@ def generate_summary(db: Session = Depends(get_sql_db), model_classes = model_cl
          if total:
               list_of_totals.append(total[0])
 
-    sum_of_totals = sum(list_of_totals)
+    # sum_of_totals = sum(list_of_totals)
     transaction_data = {    
-        'date': '2024-07-21',
-        'sum_of_acc': sum_of_totals,
-        'last_update_profit': 0,
-        'sum_of_deposits': 0,
-        'all_time_profit': 0}
+        'date': '2024-07-31',
+        'sum_of_acc': 200000,
+        'last_update_profit': 4000,
+        'sum_of_deposits': 3500,
+        'all_time_profit': 50000}
 
     transaction = TransactionService(db)
     add_summary = transaction.add_transaction(model_class=models.PortfolioSummary, transaction_data=transaction_data)
 
     print(sum(list_of_totals))
-    return list_of_totals
+    return transaction_data
 
 
 
