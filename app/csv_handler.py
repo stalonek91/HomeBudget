@@ -4,7 +4,7 @@ import pandas as pd
 
 class CSVHandler:
 
-    def __init__(self, df: pd.DataFrame) -> None:
+    def __init__(self, df: pd.DataFrame = None) -> None:
 
         self.df = df
         self.columns_to_keep = [
@@ -27,6 +27,7 @@ class CSVHandler:
         try:
             print('CSV file loaded succesfully')
             return self.df
+
         except Exception as e:
             print(f'Error occurred: {str(e)}')
             return None
@@ -75,19 +76,25 @@ class CSVHandler:
             print(f'Error occurred: {str(e)}')
             return None
 
-            
 
-            
+    def remove_dupl(self, df):
+
+        dict_of_words = {
+        "Zabka": ["ZABKA Z"],
+        "Stacja Paliw": ["STACJA PAL"],
+        "Buk": ["ETOTO.PL", "FORTUNA", "BETCLIC", "BUKMAC", "TOTALBET"],
+        "Revolut": ["REVOL"],
+        "Lidl": ["SKLEP LIDL"]
+    }
+
+        for category, patterns in dict_of_words.items():
+            df['receiver'] = df['receiver'].apply(
+                lambda x: category if any (pattern in x for pattern in patterns) else x
+            )
 
         
 
-
-
-
-        except Exception as e:
-            print(f'Error occurred: {str(e)}')
-            return None
-        return last_df
+        return df
 
 
 

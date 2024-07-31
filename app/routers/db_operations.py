@@ -1,6 +1,7 @@
 from fastapi import status, Depends, Body, HTTPException, Request, APIRouter, UploadFile, File
 from sqlalchemy import func
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from typing import List
 from .. csv_handler import CSVHandler
 from app.database import get_sql_db
@@ -135,17 +136,25 @@ def add_csv(file: UploadFile = File(...), db: Session = Depends(get_sql_db)):
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error converting DataFrame to dict: {str(e)}")
         
-        transaction_service = TransactionService(db)
-        new_transactions =  transaction_service.add_transactions(models.Transaction, list(df_to_dict.values()))
-        ids = [transaction.id for transaction in new_transactions]
 
-        return {
-               "status": "success",
-               "records_processed:": len(df_to_dict)
-        }
+        try:
+            transaction_service = TransactionService(db)
+            transaction_service.add_transactions(models.Transaction, list(df_to_dict.values()))
+            
 
+            return {
+                "status": "success",
+                "records_processed:": len(df_to_dict)
+            }
+
+        except IntegrityError as e:
+               db.rollback()
+               raise HTTPException(
+                      status_code=status.HTTP_400_BAD_REQUEST,
+                      detail="Duplicate ref_number found. This transaction already exists in db"
+               )
         
-    return f'Added properly!!!'
+    raise HTTPException(status_code=500, detail="Failed to add transactions to the database")
 
 
 
