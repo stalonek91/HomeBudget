@@ -2,6 +2,8 @@ import streamlit as st
 import requests
 import pandas as pd
 import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
 import time
 
 from io import StringIO
@@ -29,8 +31,40 @@ def main():
         tab1, tab2, tab3 = st.tabs(["Lorem Ipsum xd", "Wazne", "Sojka Sylwester Portfolio Project CV"])
 
         with tab1:
-            st.title("Jan Router 3")
-            st.image('/Users/sylwestersojka/Documents/HomeBudget/app/papaj3.png')
+            # Sample data
+            data = {
+                'date': pd.date_range(start='2021-05-01', periods=7, freq='M'),
+                'value': [3000, 4500, 4000, 5000, 5500, 4800, 7000]
+            }
+            df = pd.DataFrame(data)
+
+            # Create a Plotly figure
+            fig = go.Figure()
+
+            # Add a trace for the area chart
+            fig.add_trace(go.Scatter(
+                x=df['date'],
+                y=df['value'],
+                mode='lines+markers',
+                line=dict(color='green', width=4),
+                fill='tozeroy',  # fill area to xaxis
+                fillcolor='rgba(0,255,0,0.1)',  # Set the fill color with transparency
+                marker=dict(size=8)  # Marker size
+            ))
+
+            # Customize the layout
+            fig.update_layout(
+                title='Sample Area Chart with Line',
+                xaxis_title='Date',
+                yaxis_title='Value',
+                xaxis=dict(showgrid=False),
+                yaxis=dict(showgrid=False),
+                plot_bgcolor='white'  # Set background color to white
+            )
+
+            # Display the plot in Streamlit
+            st.plotly_chart(fig)
+
 
         with tab2:
             st.title('Powazna Strona.')
