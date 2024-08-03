@@ -8,6 +8,7 @@ import app.schemas as schemas
 import app.models as models
 from app.transaction_service import TransactionService
 import pandas as pd
+from datetime import datetime
 
 router = APIRouter(tags=["portfolio_endpoints"], prefix="/portfolio")
 
@@ -77,11 +78,14 @@ def get_all_portfolio(id: int, db: Session = Depends(get_sql_db)):
 #TODO: implement generate_portfolio_entry function
 # columns from each table with total amount
 #'total_amount'
+# check if sum of last deposit per month can be added like n - n-1 
 
 @router.post("/generate_summary",response_model=schemas.PortfolioSummarySchema, status_code=status.HTTP_201_CREATED)
 def generate_summary(db: Session = Depends(get_sql_db), model_classes = model_classes):
      
     list_of_totals = []
+    list_of_deposits = []
+    todays_date = datetime.today().strftime('%Y-%m-%d')
     
 
     for model_name, model_class in model_classes.items():
@@ -89,16 +93,28 @@ def generate_summary(db: Session = Depends(get_sql_db), model_classes = model_cl
          if total:
               list_of_totals.append(total[0])
 
-    # sum_of_totals = sum(list_of_totals)
+    for model_name, model_class in model_classes.items():
+         sum_of_each_dep = db.query(func.sum(model_class.deposit_amount)).scalar()
+         if sum_of_each_dep:
+              list_of_deposits.append(sum_of_each_dep)
+
+    sum_of_totals = sum(list_of_totals)
+    sum_of_deposits = sum(list_of_deposits)
+
+    last_total_entry = db.query(models.PortfolioSummary).order_by(desc(models.PortfolioSummary.date)).offset(0).first()
+    value_last_total_entry = last_total_entry.sum_of_acc if last_total_entry else None
+
+
+    print(sum_of_deposits)
     transaction_data = {    
-        'date': '2024-07-31',
-        'sum_of_acc': 200000,
-        'last_update_profit': 4000,
-        'sum_of_deposits': 3500,
-        'all_time_profit': 50000}
+        'date': todays_date,
+        'sum_of_acc': sum_of_totals,
+        'last_update_profit': sum_of_totals-value_last_total_entry if value_last_total_entry else 0,
+        'sum_of_deposits': sum_of_deposits,
+        'all_time_profit': sum_of_totals-sum_of_deposits}
 
     transaction = TransactionService(db)
-    add_summary = transaction.add_transaction(model_class=models.PortfolioSummary, transaction_data=transaction_data)
+    transaction.add_transaction(model_class=models.PortfolioSummary, transaction_data=transaction_data)
 
     print(sum(list_of_totals))
     return transaction_data

@@ -24,13 +24,14 @@ def get_portfolio_perc():
         st.error(f"Failed to fetch response data: {response.status_code}")
         return []
     
+def add_portfolio_entry():
+    response = requests.post(f"{FASTAPI_URL}/portfolio/generate_summary")
+    if response.status_code == 201:
+        return response.json()
+    else:
+        st.error(f"Failed to fetch response data: {response.status_code}")
+        return []
 
-
-    
-#Plotly
-# def generate_summary_graph(df):
-#     fig = px.line(df, x='date', y='sum_of_acc', markers=True)
-#     fig.show()
 
 def generate_summary_chart(df):
     fig = go.Figure()
@@ -48,11 +49,7 @@ def generate_summary_chart(df):
 
     # Customize the layout
     fig.update_layout(
-        title=dict(
-            text=None,
-            font=dict(size=24, family='Arial, sans-serif', color='#FFFFFF'),  # Larger font size, white color
-            x=0.5,  # Center the title
-        ),
+
         xaxis_title=dict(
             text='Date',
             font=dict(size=14, family='Arial, sans-serif', color='#FFFFFF'),
@@ -83,6 +80,7 @@ def render_summary_section():
     st.markdown("<h1 style='text-align: center;'>Portfolio summary</h1>", unsafe_allow_html=True)
 
 
+
     portfolio_summary = fetch_portfolio_summary()
     portfolio_percentage = get_portfolio_perc()
 
@@ -92,11 +90,15 @@ def render_summary_section():
         
         st.dataframe(df)
         
-        st.button("Add portfolio entry (from today)")
+        button_clicked = st.button("Add RANDOM (for testing purpose lol) portfolio entry (from today)")
+        if button_clicked:
+            print(f'BUTTON KLIKNIETY')
+            add_portfolio_entry()
+            st.experimental_rerun()
     else:
         st.warning("No data to display")
 
-
+#FIXME: fix refreshing problem
     if portfolio_percentage:
 
         df_perc = pd.DataFrame(portfolio_percentage)

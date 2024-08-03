@@ -2,13 +2,14 @@ import streamlit as st
 import requests
 import pandas as pd
 import numpy as np
-import plotly.express as px
+
 import plotly.graph_objects as go
 import time
 
 from io import StringIO
 from streamlit_summary_section import render_summary_section
 from streamlit_transaction_section import render_transaction_section
+from streamlit_wallets import fetch_wallet_totals
 
 st.set_page_config(layout="wide")
 
@@ -23,7 +24,65 @@ def main():
 
 
     if selection == 'Summary':
-        render_summary_section()
+
+        summary_tab, vienna_tab, nokia_tab, generali_tab, revolut_tab, etoro_tab, obligacje_tab, xtb_tab = st.tabs(
+            ["Summary", "ViennaLife", "Nokia", "Generali", "Revolut", "Etoro", "Obligacje", "XTB"]
+        )
+
+        with summary_tab:
+            render_summary_section()
+        
+        with vienna_tab:
+            st.session_state['tab'] = 'ViennaLife'
+            st.write(f"{st.session_state['tab']}")
+
+            vienna_wallet = fetch_wallet_totals(st.session_state['tab'])
+            st.dataframe(vienna_wallet)
+
+        with nokia_tab:
+            st.session_state['tab'] = 'Nokia'
+            st.write(f"{st.session_state['tab']}")
+
+            nokia_wallet = fetch_wallet_totals(st.session_state['tab'])
+            st.dataframe(nokia_wallet)
+
+        with generali_tab:
+            st.session_state['tab'] = 'Generali'
+            st.write(f"{st.session_state['tab']}")
+
+            generali_wallet = fetch_wallet_totals(st.session_state['tab'])
+            st.dataframe(generali_wallet)
+
+        with revolut_tab:
+            st.session_state['tab'] = 'Revolut'
+            st.write(f"{st.session_state['tab']}")
+
+            revolut_wallet = fetch_wallet_totals(st.session_state['tab'])
+            st.dataframe(revolut_wallet)
+
+        with etoro_tab:
+            st.session_state['tab'] = 'Etoro'
+            st.write(f"{st.session_state['tab']}")
+
+            etoro_wallet = fetch_wallet_totals(st.session_state['tab'])
+            st.dataframe(etoro_wallet)
+
+        with obligacje_tab:
+            st.session_state['tab'] = 'Obligacje'
+            st.write(f"{st.session_state['tab']}")
+
+            obligacje_wallet = fetch_wallet_totals(st.session_state['tab'])
+            st.dataframe(obligacje_wallet)
+
+        with xtb_tab:
+            st.session_state['tab'] = 'XTB'
+            st.write(f"{st.session_state['tab']}")
+
+            xtb_wallet = fetch_wallet_totals(st.session_state['tab'])
+            st.dataframe(xtb_wallet)
+
+
+        
  
 
     elif selection == "Pornosy":
