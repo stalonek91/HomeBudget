@@ -9,7 +9,10 @@ import time
 from io import StringIO
 from streamlit_summary_section import render_summary_section
 from streamlit_transaction_section import render_transaction_section
-from streamlit_wallets import fetch_wallet_totals
+from streamlit_wallets import *
+
+import datetime
+
 
 st.set_page_config(layout="wide")
 
@@ -17,7 +20,7 @@ st.set_page_config(layout="wide")
 
 def main():
 
-    
+ 
 
     st.sidebar.title('Navigation')
     selection = st.sidebar.radio("Go to", ['Summary', "Transactions", "Pornosy",], index=0)
@@ -33,11 +36,39 @@ def main():
             render_summary_section()
         
         with vienna_tab:
+            print(f'VIENNA SECTION TAB')
             st.session_state['tab'] = 'ViennaLife'
             st.write(f"{st.session_state['tab']}")
-
             vienna_wallet = fetch_wallet_totals(st.session_state['tab'])
             st.dataframe(vienna_wallet)
+            generate_wallet_chart(vienna_wallet, get_time_delta(st.session_state['tab']))
+
+            st.write('Add Vienna entry:')
+            v_date = st.date_input("Date of entry")
+            v_date.strftime('%Y-%m-%d')
+
+            print(v_date)
+
+            initial_amount = float(st.number_input("Pre deposit amount:", step=100))
+            deposit_amount = float(st.number_input("Deposit amount:",step=100))
+            total_amount = float(st.number_input("Total now:",step=100))
+
+            button_clicked = st.button("Add Vienna to DB")
+            if button_clicked:
+                print(f'BUTTON_vienna KLIKNIETY')
+
+                data = {
+                        "date": v_date,
+                        "initial_amount": initial_amount,
+                        "deposit_amount": deposit_amount,
+                        "total_amount": total_amount
+                }
+
+                add_transcation(tab=st.session_state['tab'], data=data)
+                st.write(f'Following data will be send to DB: {data}')
+                st.rerun()
+            
+
 
         with nokia_tab:
             st.session_state['tab'] = 'Nokia'

@@ -71,6 +71,9 @@ class ReturnSummary(BaseModel):
         income: float
         expenses: float
 
+class ReturnDate(BaseModel):
+    date: date
+
 class PortfolioSummarySchema(BaseModel):
     id: Optional[int] = None
     date: date

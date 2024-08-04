@@ -94,7 +94,7 @@ def render_summary_section():
         if button_clicked:
             print(f'BUTTON KLIKNIETY')
             add_portfolio_entry()
-            st.experimental_rerun()
+            st.rerun()
     else:
         st.warning("No data to display")
 

@@ -23,12 +23,17 @@ def update_vienna(id: int, vienna_body: schemas.UpdatePortfolioTransaction = Bod
     
     return updated_transaction
        
-       
+
+@router.get("/get_all_dates", response_model=List[schemas.ReturnDate], status_code=status.HTTP_200_OK)
+def get_all_dates(db: Session = Depends(get_sql_db)):
+        vienna_entries = db.query(models.Vienna.date).all()
+        
+        return vienna_entries
 
 @router.get("/get_all_vienna", response_model=List[schemas.PortfolioTransaction], status_code=status.HTTP_200_OK)
 def get_all_vienna(db: Session = Depends(get_sql_db)):
         vienna_entries = db.query(models.Vienna).all()
-        print(vienna_entries)
+        
         return vienna_entries
 
 @router.get("/get_id_vienna/{id}", response_model=schemas.PortfolioTransaction, status_code=status.HTTP_200_OK)
