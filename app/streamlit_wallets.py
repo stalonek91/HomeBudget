@@ -82,6 +82,63 @@ def add_transcation(tab, data):
         st.error(f"Failed to process POST request: {response.status_code}")
         return []
 
+
+def generate_wallet_chart_2nd_with_legend(wallet_data):
+
+    df = pd.DataFrame(wallet_data)
+
+     # Debug: Print DataFrame columns and first few rows
+    print("Columns in DataFrame:", df.columns)
+    print("First few rows of the DataFrame:\n", df.head())
+
+    # Check if the necessary columns exist
+    if 'total_amount' not in df.columns or 'deposit_amount' not in df.columns:
+        st.error("DataFrame must contain 'total_amount' and 'deposit_amount' columns.")
+        return
+
+    # Calculate profit as a separate column
+    df['profit'] = df['total_amount'] - df['deposit_amount']
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        x=df['date'], 
+        y=df['deposit_amount'], 
+        name='Deposit Amount',
+        marker=dict(color='lightblue')
+    ))
+
+    fig.add_trace(go.Bar(
+        x=df['date'], 
+        y=df['profit'], 
+        name='Profit',
+        marker=dict(color='blue')
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=df['date'], 
+        y=df['total_amount'], 
+        mode='lines+markers', 
+        name='Total Amount Trend',
+        line=dict(color='red', width=2),
+        marker=dict(size=6)
+    ))
+
+    fig.update_layout(
+        barmode='stack',
+        xaxis_title='Date',
+        yaxis_title='Value',
+        title='ViennaLife',
+        xaxis=dict(
+            tickformat="%Y-%m-%d",
+            tickmode="array",
+            tickvals=df['date'].tolist(),
+        )
+    )
+
+    # Show the figure
+    st.plotly_chart(fig)
+
     
 def generate_wallet_chart(df, time_delta):
 
@@ -92,14 +149,16 @@ def generate_wallet_chart(df, time_delta):
     # Adjust bar width and other properties if necessary
     fig.update_traces(marker_line_width=0.3)
 
+
+
     # Ensure tickvals receives a list of values, not being mistakenly indexed
     fig.update_xaxes(
         tickformat="%Y-%m-%d",  
         tickmode="array",
         # tickvals=time_delta,
-        rangebreaks=[
-            dict(values=time_delta)
-        ]
+        # rangebreaks=[
+        #     dict(values=time_delta)
+        # ]
     )
 
     

@@ -36,29 +36,50 @@ def main():
             render_summary_section()
         
         with vienna_tab:
+
+            
+            
+
             print(f'VIENNA SECTION TAB')
             st.session_state['tab'] = 'ViennaLife'
             st.write(f"{st.session_state['tab']}")
+
+
             vienna_wallet = fetch_wallet_totals(st.session_state['tab'])
-            st.dataframe(vienna_wallet)
-            generate_wallet_chart(vienna_wallet, get_time_delta(st.session_state['tab']))
+            print(f'Vienna_wallet DF type is: {type(vienna_wallet)} with values: {vienna_wallet}')
+
+            
+            
+            # generate_wallet_chart(vienna_wallet, get_time_delta(st.session_state['tab']))
+            generate_wallet_chart_2nd_with_legend(vienna_wallet)
 
             st.write('Add Vienna entry:')
-            v_date = st.date_input("Date of entry")
-            v_date.strftime('%Y-%m-%d')
 
-            print(v_date)
+            col1, col2, col3, col4, col5 = st.columns(5, vertical_alignment="bottom")
 
-            initial_amount = float(st.number_input("Pre deposit amount:", step=100))
-            deposit_amount = float(st.number_input("Deposit amount:",step=100))
-            total_amount = float(st.number_input("Total now:",step=100))
+            with col1:
+                v_date = st.date_input("Date of entry")
+                f_date = v_date.strftime('%Y-%m-%d')
 
-            button_clicked = st.button("Add Vienna to DB")
+            with col2:
+                initial_amount = float(st.number_input("Pre deposit amount:", step=100))
+
+            with col3:
+                deposit_amount = float(st.number_input("Deposit amount:",step=100))
+            
+            with col4:
+                total_amount = float(st.number_input("Total now:",step=100))
+
+            with col5:
+                button_clicked = st.button("Add Vienna to DB")
+
+
+
             if button_clicked:
                 print(f'BUTTON_vienna KLIKNIETY')
 
                 data = {
-                        "date": v_date,
+                        "date": f_date,
                         "initial_amount": initial_amount,
                         "deposit_amount": deposit_amount,
                         "total_amount": total_amount
@@ -68,7 +89,7 @@ def main():
                 st.write(f'Following data will be send to DB: {data}')
                 st.rerun()
             
-
+            st.dataframe(vienna_wallet)
 
         with nokia_tab:
             st.session_state['tab'] = 'Nokia'
