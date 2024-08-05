@@ -37,20 +37,10 @@ def main():
         
         with vienna_tab:
 
-            
-            
-
-            print(f'VIENNA SECTION TAB')
             st.session_state['tab'] = 'ViennaLife'
-            st.write(f"{st.session_state['tab']}")
-
+            
 
             vienna_wallet = fetch_wallet_totals(st.session_state['tab'])
-            print(f'Vienna_wallet DF type is: {type(vienna_wallet)} with values: {vienna_wallet}')
-
-            
-            
-            # generate_wallet_chart(vienna_wallet, get_time_delta(st.session_state['tab']))
             generate_wallet_chart_2nd_with_legend(vienna_wallet)
 
             st.write('Add Vienna entry:')
@@ -73,8 +63,6 @@ def main():
             with col5:
                 button_clicked = st.button("Add Vienna to DB")
 
-
-
             if button_clicked:
                 print(f'BUTTON_vienna KLIKNIETY')
 
@@ -90,6 +78,20 @@ def main():
                 st.rerun()
             
             st.dataframe(vienna_wallet)
+
+            dates_to_delete = [d['date'] for d in vienna_wallet]
+            print(dates_to_delete)
+
+            del1, del2 = st.columns(2, vertical_alignment="bottom")
+
+            with del1:
+                options = st.multiselect(
+                    "Select date for delete:",
+                    dates_to_delete
+                )
+
+            with del2:
+                button_delete = st.button('Delete entry from DB')
 
         with nokia_tab:
             st.session_state['tab'] = 'Nokia'

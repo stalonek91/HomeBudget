@@ -7,6 +7,7 @@ from app.database import get_sql_db
 import app.schemas as schemas
 import app.models as models
 from app.transaction_service import TransactionService
+from datetime import datetime
 
 router = APIRouter(tags=["vienna_endpoints"], prefix="/vienna")
 
@@ -76,3 +77,32 @@ def add_vienna_transaction(vienna: schemas.PortfolioTransaction, db: Session = D
     db.refresh(vienna_entry)
 
     return vienna_entry
+
+
+@router.delete("/delete_vienna_transaction/{transaction_date}", status_code= status.HTTP_200_OK)
+def delete_vienna_transaction(transaction_date: str, db: Session = Depends(get_sql_db)):
+      viena_query = db.query(models.Vienna).filter(models.Vienna.date == transaction_date)
+      vienna_entry = viena_query.first()
+
+      try:
+            transaction_date_object = datetime.strptime(transaction_date, '%Y-%m-%d').date()
+      except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Expected 'YYYY-MM-DD'.")
+
+      print(f'DEBUG: Transaction_date is type: {type(transaction_date)} and value: {transaction_date}')
+      print(f'DEBUG: models.Vienana.date is type: {type(models.Obligacje.date)} with value: {vienna_entry}')
+
+      
+
+      if vienna_entry is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Vienna with date: {transaction_date} has not been found')
+      
+      try:
+            db.delete(vienna_entry)
+            db.commit()
+            return f'Entry with date: {transaction_date} deleted succesfully!'
+      
+      except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'There has been a problem with deleting from DB: {str(e)}')
+            
+
