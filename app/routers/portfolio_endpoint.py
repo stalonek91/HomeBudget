@@ -1,5 +1,5 @@
 from fastapi import status, Depends, Body, HTTPException, Request, APIRouter
-from sqlalchemy import desc, func
+from sqlalchemy import desc, func, asc
 from sqlalchemy.orm import Session
 from typing import List
 from .. csv_handler import CSVHandler
@@ -63,7 +63,7 @@ def update_portfolio(id: int, portfolio_body: schemas.UpdatePortfolioTransaction
 
 @router.get("/get_all_portfolio", response_model=List[schemas.PortfolioSummarySchema], status_code=status.HTTP_200_OK)
 def get_all_portfolio(db: Session = Depends(get_sql_db)):
-        portfolio_entries = db.query(models.PortfolioSummary).order_by(models.PortfolioSummary.id.asc()).all()
+        portfolio_entries = db.query(models.PortfolioSummary).order_by(asc(models.PortfolioSummary.date)).all()
         print(portfolio_entries)
         return portfolio_entries
 

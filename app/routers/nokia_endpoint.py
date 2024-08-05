@@ -1,5 +1,5 @@
 from fastapi import status, Depends, Body, HTTPException, Request, APIRouter
-from sqlalchemy import func
+from sqlalchemy import func, asc
 from sqlalchemy.orm import Session
 from typing import List
 from .. csv_handler import CSVHandler
@@ -27,7 +27,7 @@ def update_nokia(id: int, nokia_body: schemas.UpdatePortfolioTransaction = Body(
 
 @router.get("/get_all_nokia", response_model=List[schemas.PortfolioTransaction], status_code=status.HTTP_200_OK)
 def get_all_nokia(db: Session = Depends(get_sql_db)):
-        nokia_entries = db.query(models.Nokia).all()
+        nokia_entries = db.query(models.Nokia).order_by(asc(models.Nokia.date)).all()
         print(nokia_entries)
         return nokia_entries
 

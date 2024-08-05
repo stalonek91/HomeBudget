@@ -36,113 +36,32 @@ def main():
             render_summary_section()
         
         with vienna_tab:
-
-            st.session_state['tab'] = 'ViennaLife'
-            
-
-            vienna_wallet = fetch_wallet_totals(st.session_state['tab'])
-            generate_wallet_chart_2nd_with_legend(vienna_wallet)
-
-            st.write('Add Vienna entry:')
-
-            col1, col2, col3, col4, col5 = st.columns(5, vertical_alignment="bottom")
-
-            with col1:
-                v_date = st.date_input("Date of entry")
-                f_date = v_date.strftime('%Y-%m-%d')
-
-            with col2:
-                initial_amount = float(st.number_input("Pre deposit amount:", step=100))
-
-            with col3:
-                deposit_amount = float(st.number_input("Deposit amount:",step=100))
-            
-            with col4:
-                total_amount = float(st.number_input("Total now:",step=100))
-
-            with col5:
-                button_clicked = st.button("Add Vienna to DB")
-
-            if button_clicked:
-                print(f'BUTTON_vienna KLIKNIETY')
-
-                data = {
-                        "date": f_date,
-                        "initial_amount": initial_amount,
-                        "deposit_amount": deposit_amount,
-                        "total_amount": total_amount
-                }
-
-                add_transcation(tab=st.session_state['tab'], data=data)
-                st.write(f'Following data will be send to DB: {data}')
-                st.rerun()
-            
-            st.dataframe(vienna_wallet)
-
-            dates_to_delete = [d['date'] for d in vienna_wallet]
-            print(dates_to_delete)
-
-            del1, del2 = st.columns(2, vertical_alignment="bottom")
-
-            with del1:
-                selected_dates = st.multiselect(
-                    "Select date for delete:",
-                    dates_to_delete
-                )
-
-            with del2:
-                button_delete = st.button('Delete entry from DB')
-
-                if button_delete:
-                    if selected_dates:
-                        for date in selected_dates:
-                            delete_transaction(tab=st.session_state['tab'], date_obj=date)
-                    st.rerun()
-                    
-                    
-                    
+            tab = st.session_state['tab'] = 'ViennaLife'
+            generate_wallet_tab(tab)
 
         with nokia_tab:
-            st.session_state['tab'] = 'Nokia'
-            st.write(f"{st.session_state['tab']}")
-
-            nokia_wallet = fetch_wallet_totals(st.session_state['tab'])
-            st.dataframe(nokia_wallet)
+            tab = st.session_state['tab'] = 'Nokia'
+            generate_wallet_tab(tab)
 
         with generali_tab:
-            st.session_state['tab'] = 'Generali'
-            st.write(f"{st.session_state['tab']}")
-
-            generali_wallet = fetch_wallet_totals(st.session_state['tab'])
-            st.dataframe(generali_wallet)
+            tab = st.session_state['tab'] = 'Generali'
+            generate_wallet_tab(tab)
 
         with revolut_tab:
-            st.session_state['tab'] = 'Revolut'
-            st.write(f"{st.session_state['tab']}")
-
-            revolut_wallet = fetch_wallet_totals(st.session_state['tab'])
-            st.dataframe(revolut_wallet)
+            tab = st.session_state['tab'] = 'Revolut'
+            generate_wallet_tab(tab)
 
         with etoro_tab:
-            st.session_state['tab'] = 'Etoro'
-            st.write(f"{st.session_state['tab']}")
-
-            etoro_wallet = fetch_wallet_totals(st.session_state['tab'])
-            st.dataframe(etoro_wallet)
+            tab = st.session_state['tab'] = 'Etoro'
+            generate_wallet_tab(tab)
 
         with obligacje_tab:
-            st.session_state['tab'] = 'Obligacje'
-            st.write(f"{st.session_state['tab']}")
-
-            obligacje_wallet = fetch_wallet_totals(st.session_state['tab'])
-            st.dataframe(obligacje_wallet)
+            tab = st.session_state['tab'] = 'Obligacje'
+            generate_wallet_tab(tab)
 
         with xtb_tab:
-            st.session_state['tab'] = 'XTB'
-            st.write(f"{st.session_state['tab']}")
-
-            xtb_wallet = fetch_wallet_totals(st.session_state['tab'])
-            st.dataframe(xtb_wallet)
+            tab = st.session_state['tab'] = 'XTB'
+            generate_wallet_tab(tab)
 
 
         

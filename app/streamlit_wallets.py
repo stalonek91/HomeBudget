@@ -224,6 +224,68 @@ def get_time_delta(tab):
     
     return all_dates
 
+
+def generate_wallet_tab(tab):
+
+    wallet_data = fetch_wallet_totals(st.session_state['tab'])
+    generate_wallet_chart_2nd_with_legend(wallet_data)
+
+    st.write('Add Vienna entry:')
+
+    col1, col2, col3, col4, col5 = st.columns(5, vertical_alignment="bottom")
+
+    with col1:
+        v_date = st.date_input("Date of entry", key=f"{tab}_date_input")
+        f_date = v_date.strftime('%Y-%m-%d')
+
+    with col2:
+        initial_amount = float(st.number_input("Pre deposit amount:", step=100, key=f"{tab}_initial_number"))
+
+    with col3:
+        deposit_amount = float(st.number_input("Deposit amount:",step=100, key=f"{tab}_deposit_amount"))
+    
+    with col4:
+        total_amount = float(st.number_input("Total now:",step=100, key=f"{tab}_total_amount"))
+
+    with col5:
+        button_clicked = st.button(f"Add {tab} to DB", key=f"{tab}_add_button")
+
+    if button_clicked:
+        print(f'BUTTON_{tab} KLIKNIETY')
+
+        data = {
+                "date": f_date,
+                "initial_amount": initial_amount,
+                "deposit_amount": deposit_amount,
+                "total_amount": total_amount
+        }
+
+        add_transcation(tab=tab, data=data)
+        st.write(f'Following data will be send to DB: {data}')
+        st.rerun()
+    
+    st.dataframe(wallet_data)
+
+    dates_to_delete = [d['date'] for d in wallet_data]
+    print(dates_to_delete)
+
+    del1, del2 = st.columns(2, vertical_alignment="bottom")
+
+    with del1:
+        selected_dates = st.multiselect(
+            "Select date for delete:",
+            dates_to_delete,
+            key=f"{tab}_dates_to_delete"
+        )
+
+    with del2:
+        button_delete = st.button('Delete entry from DB', key=f"{tab}_delete_button")
+
+        if button_delete:
+            if selected_dates:
+                for date in selected_dates:
+                    delete_transaction(tab=tab, date_obj=date)
+            st.rerun()
  
     
 

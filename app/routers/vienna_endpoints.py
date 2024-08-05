@@ -1,5 +1,5 @@
 from fastapi import status, Depends, Body, HTTPException, Request, APIRouter
-from sqlalchemy import func
+from sqlalchemy import func, asc
 from sqlalchemy.orm import Session
 from typing import List
 from .. csv_handler import CSVHandler
@@ -33,7 +33,7 @@ def get_all_dates(db: Session = Depends(get_sql_db)):
 
 @router.get("/get_all_vienna", response_model=List[schemas.PortfolioTransaction], status_code=status.HTTP_200_OK)
 def get_all_vienna(db: Session = Depends(get_sql_db)):
-        vienna_entries = db.query(models.Vienna).all()
+        vienna_entries = db.query(models.Vienna).order_by(asc(models.Vienna.date)).all()
         
         return vienna_entries
 

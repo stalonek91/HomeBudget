@@ -1,5 +1,5 @@
 from fastapi import status, Depends, Body, HTTPException, Request, APIRouter
-from sqlalchemy import func
+from sqlalchemy import func, asc
 from sqlalchemy.orm import Session
 from typing import List
 from .. csv_handler import CSVHandler
@@ -27,7 +27,7 @@ def update_obligacje(id: int, obligacje_body: schemas.UpdatePortfolioTransaction
 
 @router.get("/get_all_obligacje", response_model=List[schemas.PortfolioTransaction], status_code=status.HTTP_200_OK)
 def get_all_obligacje(db: Session = Depends(get_sql_db)):
-        obligacje_entries = db.query(models.Obligacje).all()
+        obligacje_entries = db.query(models.Obligacje).order_by(asc(models.Obligacje.date)).all_()
         print(obligacje_entries)
         return obligacje_entries
 
