@@ -24,7 +24,7 @@ def main():
 
     st.sidebar.title('Navigation')
     selection = st.sidebar.radio("Go to", ['Summary', "Transactions", "Pornosy",], index=0)
-
+    st.image('/Users/sylwestersojka/Documents/HomeBudget/app/belka.png')
 
     if selection == 'Summary':
 
@@ -85,13 +85,22 @@ def main():
             del1, del2 = st.columns(2, vertical_alignment="bottom")
 
             with del1:
-                options = st.multiselect(
+                selected_dates = st.multiselect(
                     "Select date for delete:",
                     dates_to_delete
                 )
 
             with del2:
                 button_delete = st.button('Delete entry from DB')
+
+                if button_delete:
+                    if selected_dates:
+                        for date in selected_dates:
+                            delete_transaction(tab=st.session_state['tab'], date_obj=date)
+                    st.rerun()
+                    
+                    
+                    
 
         with nokia_tab:
             st.session_state['tab'] = 'Nokia'

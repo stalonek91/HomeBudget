@@ -36,6 +36,16 @@ add_transaction_endpoints = {
     "XTB" : "/xtb/add_xtb_transaction"
 }
 
+delete_transaction_endpoints = {
+    "ViennaLife": "/vienna/delete_vienna_transaction/",
+    "Nokia": "/nokia/delete_nokia_transaction",
+    "Generali": "/generali/delete_generali_transaction",
+    "Revolut": "/revolut/delete_revolut_transaction",
+    "Etoro": "/transactions/delete_etoro_transaction",
+    "Obligacje": "/obligacje/delete_obligacje_transaction",
+    "XTB" : "/xtb/delete_xtb_transaction"
+}
+
 def get_wallet_dates(tab):
 
     endpoint = date_wallet_endpoints[tab]
@@ -81,6 +91,28 @@ def add_transcation(tab, data):
     else:
         st.error(f"Failed to process POST request: {response.status_code}")
         return []
+    
+def delete_transaction(tab, date_obj):
+    print(f'DEBUG: delete_transaction endpoint function called')
+    endpoint = delete_transaction_endpoints[tab]
+    
+    url = f"{FASTAPI_URL}{endpoint}{date_obj}"
+
+    print(f'SELECTED ENDPOINT: {endpoint}')
+    print(f'SELECTED URL: {url}')
+
+    print(f'DELETE_TRANSACTION: Entry with date: {date_obj} will be removed')
+
+    response = requests.delete(url = url)
+
+    if response.status_code == 200:
+        return 'Entry Deleted'
+    else:
+        st.error(f"Failed to process POST request: {response.status_code}")
+        return []
+    
+
+
 
 
 def generate_wallet_chart_2nd_with_legend(wallet_data):
