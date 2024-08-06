@@ -27,7 +27,7 @@ def update_xtb(id: int, xtb_body: schemas.UpdatePortfolioTransaction = Body(...)
 
 @router.get("/get_all_xtb", response_model=List[schemas.PortfolioTransaction], status_code=status.HTTP_200_OK)
 def get_all_xtb(db: Session = Depends(get_sql_db)):
-        xtb_entries = db.query(models.Xtb).order_by(asc(models.Xtb)).all()
+        xtb_entries = db.query(models.Xtb).order_by(asc(models.Xtb.date)).all()
         print(xtb_entries)
         return xtb_entries
 

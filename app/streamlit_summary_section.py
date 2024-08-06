@@ -31,6 +31,22 @@ def add_portfolio_entry():
     else:
         st.error(f"Failed to fetch response data: {response.status_code}")
         return []
+    
+def delete_portfolio(date_obj):
+    print(f'DEBUG: delete_portfolio endpoint function called')
+    url = f"{FASTAPI_URL}/portfolio/delete_portfolio/{date_obj}"
+
+    print(f'DELETE_TRANSACTION: Entry with date: {date_obj} will be removed')
+
+    response = requests.delete(url=url)
+
+    if response.status_code == 200:
+        return 'Entry Deleted'
+    else:
+        st.error(f"Failed to process POST request: {response.status_code}")
+        return []
+
+    
 
 
 def generate_summary_chart(df):
@@ -82,21 +98,48 @@ def render_summary_section():
 
 
     portfolio_summary = fetch_portfolio_summary()
+    dates_to_delete = [d['date'] for d in portfolio_summary]
     portfolio_percentage = get_portfolio_perc()
 
     if portfolio_summary:
         df = pd.DataFrame(portfolio_summary)
         generate_summary_chart(df)
-        
         st.dataframe(df)
+
         
-        button_clicked = st.button("Add RANDOM (for testing purpose lol) portfolio entry (from today)")
+        
+        
+    else:
+        st.warning("No data to display")
+
+    col1, col2, col3 = st.columns(3, vertical_alignment="bottom")
+
+    with col1:
+        
+        button_clicked = st.button("Generate Monthly report")
         if button_clicked:
             print(f'BUTTON KLIKNIETY')
             add_portfolio_entry()
             st.rerun()
-    else:
-        st.warning("No data to display")
+
+    with col2:
+        
+        selected_portfolio_dates = st.multiselect(
+            "Select date for delete:",
+            dates_to_delete,
+            key="summary_dates_to_delete"
+        )
+
+
+    with col3:
+        
+        button_delete = st.button("Delete entry")
+        if button_delete:
+            if selected_portfolio_dates:
+                for date in selected_portfolio_dates:
+                    delete_portfolio(date)
+            st.rerun()
+            
 
 #FIXME: fix refreshing problem
     if portfolio_percentage:
@@ -115,10 +158,3 @@ def render_summary_section():
         st.plotly_chart(fig)
 
 
-        options = st.selectbox(
-        "Show wallet details",
-        df_perc,
-        index=None,
-        placeholder="Select Your wallet",
-        )
-        st.write("You selected:", options)

@@ -27,7 +27,7 @@ def update_generali(id: int, generali_body: schemas.UpdatePortfolioTransaction =
 
 @router.get("/get_all_generali", response_model=List[schemas.PortfolioTransaction], status_code=status.HTTP_200_OK)
 def get_all_generali(db: Session = Depends(get_sql_db)):
-        generali_entries = db.query(models.Generali).order_by(asc(models.Generali)).all()
+        generali_entries = db.query(models.Generali).order_by(asc(models.Generali.date)).all()
         print(generali_entries)
         return generali_entries
 

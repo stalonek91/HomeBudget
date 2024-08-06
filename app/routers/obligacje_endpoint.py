@@ -27,7 +27,7 @@ def update_obligacje(id: int, obligacje_body: schemas.UpdatePortfolioTransaction
 
 @router.get("/get_all_obligacje", response_model=List[schemas.PortfolioTransaction], status_code=status.HTTP_200_OK)
 def get_all_obligacje(db: Session = Depends(get_sql_db)):
-        obligacje_entries = db.query(models.Obligacje).order_by(asc(models.Obligacje.date)).all_()
+        obligacje_entries = db.query(models.Obligacje).order_by(asc(models.Obligacje.date)).all()
         print(obligacje_entries)
         return obligacje_entries
 

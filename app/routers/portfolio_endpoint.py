@@ -122,10 +122,11 @@ def generate_summary(db: Session = Depends(get_sql_db), model_classes = model_cl
 
 
 
-@router.delete("/delete_portfolio/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_oportfolio(id: int, db: Session = Depends(get_sql_db)):
-    get_obl_id = db.query(models.PortfolioSummary).filter(models.PortfolioSummary.id == id)
+@router.delete("/delete_portfolio/{transaction_date}", status_code=status.HTTP_200_OK)
+def delete_oportfolio(transaction_date: str, db: Session = Depends(get_sql_db)):
+    get_obl_id = db.query(models.PortfolioSummary).filter(models.PortfolioSummary.date == transaction_date)
     portfolio = get_obl_id.first()
+
 
     if portfolio is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'portfolio with id: {id} has not been found')
@@ -133,7 +134,7 @@ def delete_oportfolio(id: int, db: Session = Depends(get_sql_db)):
     try:
         db.delete(portfolio)
         db.commit()
-        return None
+        return f'Entry with date: {transaction_date} deleted succesfully!'
         
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'There has been a problem with deleting from DB: {str(e)}')

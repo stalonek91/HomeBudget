@@ -27,7 +27,7 @@ def update_revolut(id: int, revolut_body: schemas.UpdatePortfolioTransaction = B
 
 @router.get("/get_all_revolut", response_model=List[schemas.PortfolioTransaction], status_code=status.HTTP_200_OK)
 def get_all_revolut(db: Session = Depends(get_sql_db)):
-        revolut_entries = db.query(models.Revolut).order_by(asc(models.Revolut)).all()
+        revolut_entries = db.query(models.Revolut).order_by(asc(models.Revolut.date)).all()
         print(revolut_entries)
         return revolut_entries
 

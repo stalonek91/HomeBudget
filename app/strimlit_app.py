@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 import time
 
 from io import StringIO
-from streamlit_summary_section import render_summary_section
+from streamlit_summary_section import render_summary_section, delete_portfolio
 from streamlit_transaction_section import render_transaction_section
 from streamlit_wallets import *
 
