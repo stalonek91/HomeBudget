@@ -120,7 +120,7 @@ def generate_summary(db: Session = Depends(get_sql_db), model_classes = model_cl
     return transaction_data
 
 
-
+#henlo
 
 @router.delete("/delete_portfolio/{transaction_date}", status_code=status.HTTP_200_OK)
 def delete_oportfolio(transaction_date: str, db: Session = Depends(get_sql_db)):
