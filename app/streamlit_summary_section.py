@@ -77,7 +77,8 @@ def generate_summary_chart(df):
         xaxis=dict(
             showgrid=True, gridcolor='rgba(255, 255, 255, 0.1)',  # Light grid lines
             tickangle=-45,  # Rotate x-axis labels for better readability
-            color='#FFFFFF'
+            color='#FFFFFF',
+            tickformat='%Y-%m-%d'  # Display only date without time
         ),
         yaxis=dict(
             showgrid=True, gridcolor='rgba(255, 255, 255, 0.1)',  # Light grid lines
