@@ -38,7 +38,7 @@ add_transaction_endpoints = {
 
 delete_transaction_endpoints = {
     "ViennaLife": "/vienna/delete_vienna_transaction/",
-    "Nokia": "/nokia/delete_nokia_transaction",
+    "Nokia": "/nokia/delete_nokia/",
     "Generali": "/generali/delete_generali_transaction",
     "Revolut": "/revolut/delete_revolut_transaction",
     "Etoro": "/transactions/delete_etoro_transaction",
@@ -230,7 +230,7 @@ def generate_wallet_tab(tab):
     wallet_data = fetch_wallet_totals(st.session_state['tab'])
     generate_wallet_chart_2nd_with_legend(wallet_data)
 
-    st.write('Add Vienna entry:')
+    st.write(f'Add {tab} entry:')
 
     col1, col2, col3, col4, col5 = st.columns(5, vertical_alignment="bottom")
 

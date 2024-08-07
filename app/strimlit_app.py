@@ -29,8 +29,8 @@ def main():
     if selection == 'Summary':
 
         summary_tab, vienna_tab, nokia_tab, generali_tab, revolut_tab, etoro_tab, obligacje_tab, xtb_tab = st.tabs(
-            ["Summary", "ViennaLife", "Nokia", "Generali", "Revolut", "Etoro", "Obligacje", "XTB"]
-        )
+            ["Summary", "ViennaLife", "Nokia", "Generali", "Revolut", "Etoro", "Obligacje", "XTB"])
+        
 
         with summary_tab:
             render_summary_section()

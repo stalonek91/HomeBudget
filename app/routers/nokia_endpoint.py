@@ -73,16 +73,16 @@ def add_nokia_transaction(nokia: schemas.PortfolioTransaction, db: Session = Dep
     return nokia_entry
 
 
-@router.delete("/delete_nokia/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_onokia(id: int, db: Session = Depends(get_sql_db)):
-    get_obl_id = db.query(models.Nokia).filter(models.Nokia.id == id)
+@router.delete("/delete_nokia/{transaction_date}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_onokia(transaction_date: str, db: Session = Depends(get_sql_db)):
+    get_obl_id = db.query(models.Nokia).filter(models.Nokia.date == transaction_date)
     nokia = get_obl_id.first()
 
     if nokia is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'nokia with id: {id} has not been found')
       
     try:
-        db.delete(nokia)
+        db.delete(transaction_date)
         db.commit()
         return None
         
