@@ -26,6 +26,7 @@ def get_all_transactions():
 
 
 def render_transaction_section():
+        st.image('/Users/sylwestersojka/Documents/HomeBudget/app/belka.png')
         csv_handler = CSVHandler()
         df_tr = None
         tr_tab1, tr_tab2, tr_tab3  = st.tabs(["Load CSV", "Summary", "Details of transactions"])

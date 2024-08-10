@@ -130,6 +130,7 @@ def generate_wallet_chart_2nd_with_legend(wallet_data):
 
     # Calculate profit as a separate column
     df['profit'] = df['total_amount'] - df['deposit_amount']
+    
 
     fig = go.Figure()
 
@@ -156,11 +157,15 @@ def generate_wallet_chart_2nd_with_legend(wallet_data):
         marker=dict(size=6)
     ))
 
+    y_min = df['total_amount'].min() * 0.98
+    y_max = df['total_amount'].min() * 1.02
+
     fig.update_layout(
         barmode='stack',
         xaxis_title='Date',
         yaxis_title='Value',
-        title='ViennaLife',
+        title='Wallet Chart',
+        yaxis=dict(range=[y_min, y_max]),
         xaxis=dict(
             tickformat="%Y-%m-%d",
             tickmode="array",
@@ -226,8 +231,10 @@ def get_time_delta(tab):
 
 
 def generate_wallet_tab(tab):
+    st.write(f"{tab}")
 
-    wallet_data = fetch_wallet_totals(st.session_state['tab'])
+    st.image('/Users/sylwestersojka/Documents/HomeBudget/app/belka.png')
+    wallet_data = fetch_wallet_totals(tab)
     generate_wallet_chart_2nd_with_legend(wallet_data)
 
     st.write(f'Add {tab} entry:')

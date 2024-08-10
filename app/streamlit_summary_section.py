@@ -93,7 +93,7 @@ def generate_summary_chart(df):
     st.plotly_chart(fig)
 
 def render_summary_section():
-   
+    st.image('/Users/sylwestersojka/Documents/HomeBudget/app/belka.png')
     st.markdown("<h1 style='text-align: center;'>Portfolio summary</h1>", unsafe_allow_html=True)
 
 

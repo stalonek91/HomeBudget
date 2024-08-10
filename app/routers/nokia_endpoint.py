@@ -73,8 +73,9 @@ def add_nokia_transaction(nokia: schemas.PortfolioTransaction, db: Session = Dep
     return nokia_entry
 
 
-@router.delete("/delete_nokia/{transaction_date}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_onokia(transaction_date: str, db: Session = Depends(get_sql_db)):
+@router.delete("/delete_nokia/{transaction_date}", status_code=status.HTTP_200_OK)
+def delete_nokia(transaction_date: str, db: Session = Depends(get_sql_db)):
+    
     get_obl_id = db.query(models.Nokia).filter(models.Nokia.date == transaction_date)
     nokia = get_obl_id.first()
 
@@ -84,7 +85,7 @@ def delete_onokia(transaction_date: str, db: Session = Depends(get_sql_db)):
     try:
         db.delete(transaction_date)
         db.commit()
-        return None
+        return f'Entry with date: {transaction_date} deleted succesfully!'
         
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'There has been a problem with deleting from DB: {str(e)}')
