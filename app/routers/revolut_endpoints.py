@@ -71,3 +71,23 @@ def add_revolut_transaction(revolut: schemas.PortfolioTransaction, db: Session =
     db.refresh(revolut_entry)
 
     return revolut_entry
+
+
+@router.delete("/delete_revolut/{transaction_date}", status_code=status.HTTP_200_OK)
+def delete_revolut(transaction_date: str, db: Session = Depends(get_sql_db)):
+    get_obl_id = db.query(models.Revolut).filter(models.Revolut.date == transaction_date)
+    revolut = get_obl_id.first()
+
+    if revolut is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'revolut with id: {id} has not been found')
+    
+    print(f'DEBUG: Transaction_date is type: {type(transaction_date)} and value: {transaction_date}')
+    print(f'DEBUG: models.Revolut.date is type: {type(models.Revolut.date)} with value: {revolut}')
+
+    try:
+        db.delete(revolut)
+        db.commit()
+        return None
+        
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'There has been a problem with deleting from DB: {str(e)}')

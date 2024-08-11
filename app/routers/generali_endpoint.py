@@ -73,14 +73,17 @@ def add_generali_transaction(generali: schemas.PortfolioTransaction, db: Session
     return generali_entry
 
 
-@router.delete("/delete_generali/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_ogenerali(id: int, db: Session = Depends(get_sql_db)):
-    get_obl_id = db.query(models.Generali).filter(models.Generali.id == id)
+@router.delete("/delete_generali/{transaction_date}", status_code=status.HTTP_200_OK)
+def delete_ogenerali(transaction_date: str, db: Session = Depends(get_sql_db)):
+    get_obl_id = db.query(models.Generali).filter(models.Generali.date == transaction_date)
     generali = get_obl_id.first()
 
     if generali is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'generali with id: {id} has not been found')
-      
+    
+    print(f'DEBUG: Transaction_date is type: {type(transaction_date)} and value: {transaction_date}')
+    print(f'DEBUG: models.Generali.date is type: {type(models.Generali.date)} with value: {generali}')
+
     try:
         db.delete(generali)
         db.commit()

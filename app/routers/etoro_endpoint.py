@@ -8,7 +8,7 @@ import app.schemas as schemas
 import app.models as models
 from app.transaction_service import TransactionService
 
-router = APIRouter(tags=["db_operations"], prefix="/transactions")
+router = APIRouter(tags=["etoro"], prefix="/etoro")
 
 #TODO: check ruff
 
@@ -80,6 +80,26 @@ def add_etoro_transaction(etoro: schemas.PortfolioTransaction, db: Session = Dep
 
 
 
+@router.delete("/delete_etoro/{transaction_date}", status_code=status.HTTP_200_OK)
+def delete_etoro(transaction_date: str, db: Session = Depends(get_sql_db)):
+    
+    get_obl_id = db.query(models.Etoro).filter(models.Etoro.date == transaction_date)
+    etoro = get_obl_id.first()
 
+    print(f'DEBUG: Transaction_date is type: {type(transaction_date)} and value: {transaction_date}')
+    print(f'DEBUG: models.Etoro.date is type: {type(models.Etoro.date)} with value: {etoro}')
+
+
+
+    if etoro is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'etoro with id: {id} has not been found')
+      
+    try:
+        db.delete(etoro)
+        db.commit()
+        return f'Entry with date: {etoro} deleted succesfully!'
+        
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'There has been a problem with deleting from DB: {str(e)}')
 
 
