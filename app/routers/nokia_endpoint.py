@@ -79,13 +79,18 @@ def delete_nokia(transaction_date: str, db: Session = Depends(get_sql_db)):
     get_obl_id = db.query(models.Nokia).filter(models.Nokia.date == transaction_date)
     nokia = get_obl_id.first()
 
+    print(f'DEBUG: Transaction_date is type: {type(transaction_date)} and value: {transaction_date}')
+    print(f'DEBUG: models.Nokia.date is type: {type(models.Nokia.date)} with value: {nokia}')
+
+
+
     if nokia is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'nokia with id: {id} has not been found')
       
     try:
-        db.delete(transaction_date)
+        db.delete(nokia)
         db.commit()
-        return f'Entry with date: {transaction_date} deleted succesfully!'
+        return f'Entry with date: {nokia} deleted succesfully!'
         
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'There has been a problem with deleting from DB: {str(e)}')

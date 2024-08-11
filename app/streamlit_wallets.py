@@ -93,15 +93,12 @@ def add_transcation(tab, data):
         return []
     
 def delete_transaction(tab, date_obj):
-    print(f'DEBUG: delete_transaction endpoint function called')
+    print(f'DEBUG: delete_transaction endpoint function called with tab {tab}')
     endpoint = delete_transaction_endpoints[tab]
     
     url = f"{FASTAPI_URL}{endpoint}{date_obj}"
 
-    print(f'SELECTED ENDPOINT: {endpoint}')
-    print(f'SELECTED URL: {url}')
-
-    print(f'DELETE_TRANSACTION: Entry with date: {date_obj} will be removed')
+    print(f'SELECTED ENDPOINT: {url}')
 
     response = requests.delete(url = url)
 
@@ -119,9 +116,6 @@ def generate_wallet_chart_2nd_with_legend(wallet_data):
 
     df = pd.DataFrame(wallet_data)
 
-     # Debug: Print DataFrame columns and first few rows
-    print("Columns in DataFrame:", df.columns)
-    print("First few rows of the DataFrame:\n", df.head())
 
     # Check if the necessary columns exist
     if 'total_amount' not in df.columns or 'deposit_amount' not in df.columns:
@@ -130,6 +124,7 @@ def generate_wallet_chart_2nd_with_legend(wallet_data):
 
     # Calculate profit as a separate column
     df['profit'] = df['total_amount'] - df['deposit_amount']
+    df['color'] = df['profit'].apply(lambda x: 'blue' if x>= 0 else 'red')
     
 
     fig = go.Figure()
@@ -145,7 +140,7 @@ def generate_wallet_chart_2nd_with_legend(wallet_data):
         x=df['date'], 
         y=df['profit'], 
         name='Profit',
-        marker=dict(color='blue')
+        marker=dict(color=df['color'])
     ))
 
     fig.add_trace(go.Scatter(
@@ -153,7 +148,7 @@ def generate_wallet_chart_2nd_with_legend(wallet_data):
         y=df['total_amount'], 
         mode='lines+markers', 
         name='Total Amount Trend',
-        line=dict(color='red', width=2),
+        line=dict(color='grey', width=2),
         marker=dict(size=6)
     ))
 
@@ -274,7 +269,7 @@ def generate_wallet_tab(tab):
     st.dataframe(wallet_data)
 
     dates_to_delete = [d['date'] for d in wallet_data]
-    print(dates_to_delete)
+    
 
     del1, del2 = st.columns(2, vertical_alignment="bottom")
 

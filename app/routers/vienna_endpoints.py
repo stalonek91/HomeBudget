@@ -84,13 +84,9 @@ def delete_vienna_transaction(transaction_date: str, db: Session = Depends(get_s
       viena_query = db.query(models.Vienna).filter(models.Vienna.date == transaction_date)
       vienna_entry = viena_query.first()
 
-      try:
-            transaction_date_object = datetime.strptime(transaction_date, '%Y-%m-%d').date()
-      except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid date format. Expected 'YYYY-MM-DD'.")
 
       print(f'DEBUG: Transaction_date is type: {type(transaction_date)} and value: {transaction_date}')
-      print(f'DEBUG: models.Vienana.date is type: {type(models.Obligacje.date)} with value: {vienna_entry}')
+      print(f'DEBUG: models.Vienana.date is type: {type(models.Vienna.date)} with value: {vienna_entry}')
 
       
 
