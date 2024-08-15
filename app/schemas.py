@@ -85,3 +85,12 @@ class PortfolioSummarySchema(BaseModel):
     class Config:
         orm_mode = True
 
+class ShortPortfolioSchema(BaseModel):
+    
+    Date: date
+    Total_Value: float
+
+
+    class Config:
+        orm_mode = True
+

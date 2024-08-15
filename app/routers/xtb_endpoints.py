@@ -71,3 +71,26 @@ def add_xtb_transaction(xtb: schemas.PortfolioTransaction, db: Session = Depends
     db.refresh(xtb_entry)
 
     return xtb_entry
+
+
+@router.delete("/delete_xtb/{transaction_date}", status_code=status.HTTP_200_OK)
+def delete_xtb(transaction_date: str, db: Session = Depends(get_sql_db)):
+    
+    get_obl_id = db.query(models.Xtb).filter(models.Xtb.date == transaction_date)
+    xtb = get_obl_id.first()
+
+    print(f'DEBUG: Transaction_date is type: {type(transaction_date)} and value: {transaction_date}')
+    print(f'DEBUG: models.obligacja.date is type: {type(models.Xtb.date)} with value: {xtb}')
+
+
+
+    if xtb is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'obligacja with id: {id} has not been found')
+      
+    try:
+        db.delete(xtb)
+        db.commit()
+        return f'Entry with date: {xtb} deleted succesfully!'
+        
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'There has been a problem with deleting from DB: {str(e)}')

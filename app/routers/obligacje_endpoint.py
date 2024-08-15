@@ -73,18 +73,24 @@ def add_obligacje_transaction(obligacje: schemas.PortfolioTransaction, db: Sessi
     return obligacje_entry
 
 
-@router.delete("/delete_obligacja/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_obligacja(id: int, db: Session = Depends(get_sql_db)):
-    get_obl_id = db.query(models.Obligacje).filter(models.Obligacje.id == id)
+@router.delete("/delete_obligacje/{transaction_date}", status_code=status.HTTP_200_OK)
+def delete_nokia(transaction_date: str, db: Session = Depends(get_sql_db)):
+    
+    get_obl_id = db.query(models.Obligacje).filter(models.Obligacje.date == transaction_date)
     obligacja = get_obl_id.first()
 
+    print(f'DEBUG: Transaction_date is type: {type(transaction_date)} and value: {transaction_date}')
+    print(f'DEBUG: models.obligacja.date is type: {type(models.Obligacje.date)} with value: {obligacja}')
+
+
+
     if obligacja is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Obligacja with id: {id} has not been found')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'obligacja with id: {id} has not been found')
       
     try:
         db.delete(obligacja)
         db.commit()
-        return None
+        return f'Entry with date: {obligacja} deleted succesfully!'
         
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'There has been a problem with deleting from DB: {str(e)}')

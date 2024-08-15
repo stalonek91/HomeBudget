@@ -14,7 +14,7 @@ wallet_endpoints = {
     "Nokia": "/nokia/get_all_nokia",
     "Generali": "/generali/get_all_generali",
     "Revolut": "/revolut/get_all_revolut",
-    "Etoro": "/transactions/get_all_etoro",
+    "Etoro": "/etoro/get_all_etoro",
     "Obligacje": "/obligacje/get_all_obligacje",
     "XTB" : "/xtb/get_all_xtb"
 
@@ -31,7 +31,7 @@ add_transaction_endpoints = {
     "Nokia": "/nokia/add_nokia_transaction",
     "Generali": "/generali/add_generali_transaction",
     "Revolut": "/revolut/add_revolut_transaction",
-    "Etoro": "/transactions/add_etoro_transaction",
+    "Etoro": "/etoro/add_etoro_transaction",
     "Obligacje": "/obligacje/add_obligacje_transaction",
     "XTB" : "/xtb/add_xtb_transaction"
 }
@@ -39,11 +39,11 @@ add_transaction_endpoints = {
 delete_transaction_endpoints = {
     "ViennaLife": "/vienna/delete_vienna_transaction/",
     "Nokia": "/nokia/delete_nokia/",
-    "Generali": "/generali/delete_generali_transaction",
-    "Revolut": "/revolut/delete_revolut_transaction",
-    "Etoro": "/transactions/delete_etoro_transaction",
-    "Obligacje": "/obligacje/delete_obligacje_transaction",
-    "XTB" : "/xtb/delete_xtb_transaction"
+    "Generali": "/generali/delete_generali/",
+    "Revolut": "/revolut/delete_revolut/",
+    "Etoro": "/etoro/delete_etoro/",
+    "Obligacje": "/obligacje/delete_obligacje/",
+    "XTB" : "/xtb/delete_xtb/"
 }
 
 def get_wallet_dates(tab):
@@ -152,8 +152,8 @@ def generate_wallet_chart_2nd_with_legend(wallet_data):
         marker=dict(size=6)
     ))
 
-    y_min = df['total_amount'].min() * 0.98
-    y_max = df['total_amount'].min() * 1.02
+    y_min = df['total_amount'].min() * 0.95
+    y_max = df['total_amount'].min() * 1.15
 
     fig.update_layout(
         barmode='stack',

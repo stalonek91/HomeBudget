@@ -2,7 +2,7 @@ from app.csv_handler import CSVHandler
 import app.models as models
 from app.database import engine, get_sql_db, Base
 from fastapi import FastAPI, Body, Response, status, HTTPException, Depends, Request
-from app.routers import db_operations, vienna_endpoints, xtb_endpoints, revolut_endpoints, obligacje_endpoint, generali_endpoint, nokia_endpoint, portfolio_endpoint
+from app.routers import db_operations, vienna_endpoints, xtb_endpoints, revolut_endpoints, obligacje_endpoint, generali_endpoint, nokia_endpoint, portfolio_endpoint, etoro_endpoint
 import psycopg2
 
 
@@ -18,6 +18,7 @@ app.include_router(obligacje_endpoint.router)
 app.include_router(generali_endpoint.router)
 app.include_router(nokia_endpoint.router)
 app.include_router(portfolio_endpoint.router)
+app.include_router(etoro_endpoint.router)
 
 models.Base.metadata.create_all(bind=engine)
 

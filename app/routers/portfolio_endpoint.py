@@ -80,12 +80,55 @@ def get_all_portfolio(id: int, db: Session = Depends(get_sql_db)):
 #'total_amount'
 # check if sum of last deposit per month can be added like n - n-1 
 
+
+@router.get("/generate_summary_overall",response_model=schemas.PortfolioSummarySchema, status_code=status.HTTP_200_OK)
+def generate_summary_overall(db: Session = Depends(get_sql_db), model_classes = model_classes):
+     
+    output_df = pd.DataFrame(columns= ['Date', 'Total_Value', 'Last_month_profit', 'Monthly deposit', 'All_time_profit'])
+    list_of_totals = []
+    list_of_dates = []
+
+    N = db.query(model_classes['Etoro']).count()
+
+    for i in range(N):
+         
+    
+
+        for model_name, model_class in model_classes.items():
+            
+            total = db.query(model_class.total_amount).order_by(asc(model_class.date)).offset(i).first()
+            db_date = db.query(model_class.date).order_by(asc(model_class.date)).offset(i).first()
+
+            if total:
+                total_value = total[0]
+                print(f'Value to be added from: {model_name}: {total}')
+                list_of_totals.append(total_value)
+            if db_date:
+                date_value = db_date[0]
+                print(f'Value to be added from: {model_name}: {date_value}')
+                list_of_dates.append(date_value)
+    
+
+    output_df["Total_Value"] = pd.Series(list_of_totals)
+    output_df["Date"] = pd.Series(list_of_dates)
+    col_to_dis = ["Total_Value", "Date"]
+    print(output_df[col_to_dis])
+    output_df = output_df[col_to_dis]
+
+    grouped_df = output_df.groupby('Date').sum().reset_index()
+    print(grouped_df)
+   
+
+     
+
+
 @router.post("/generate_summary",response_model=schemas.PortfolioSummarySchema, status_code=status.HTTP_201_CREATED)
 def generate_summary(db: Session = Depends(get_sql_db), model_classes = model_classes):
      
     list_of_totals = []
     list_of_deposits = []
     todays_date = datetime.today().strftime('%Y-%m-%d')
+    result_dict = {}
     
 
     for model_name, model_class in model_classes.items():
@@ -94,9 +137,11 @@ def generate_summary(db: Session = Depends(get_sql_db), model_classes = model_cl
               list_of_totals.append(total[0])
 
     for model_name, model_class in model_classes.items():
-         sum_of_each_dep = db.query(func.sum(model_class.deposit_amount)).scalar()
-         if sum_of_each_dep:
-              list_of_deposits.append(sum_of_each_dep)
+         deposit_amm = db.query(model_class.deposit_amount).order_by(desc(model_class.date)).first()
+         print(f"Type of deposit_amm is: {type(deposit_amm)}")
+         if deposit_amm:
+              deposit_amm = int(deposit_amm[0])
+              list_of_deposits.append(deposit_amm)
 
     sum_of_totals = sum(list_of_totals)
     sum_of_deposits = sum(list_of_deposits)
@@ -120,7 +165,6 @@ def generate_summary(db: Session = Depends(get_sql_db), model_classes = model_cl
     return transaction_data
 
 
-#henlo
 
 @router.delete("/delete_portfolio/{transaction_date}", status_code=status.HTTP_200_OK)
 def delete_oportfolio(transaction_date: str, db: Session = Depends(get_sql_db)):
