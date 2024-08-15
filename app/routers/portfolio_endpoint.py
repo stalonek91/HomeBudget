@@ -84,39 +84,38 @@ def get_all_portfolio(id: int, db: Session = Depends(get_sql_db)):
 @router.get("/generate_summary_overall",response_model=schemas.PortfolioSummarySchema, status_code=status.HTTP_200_OK)
 def generate_summary_overall(db: Session = Depends(get_sql_db), model_classes = model_classes):
      
-    output_df = pd.DataFrame(columns= ['Date', 'Total_Value', 'Last_month_profit', 'Monthly deposit', 'All_time_profit'])
-    list_of_totals = []
-    list_of_dates = []
+    data_frames = []
 
     N = db.query(model_classes['Etoro']).count()
 
     for i in range(N):
          
-    
+        list_of_totals, list_of_dates, list_of_deposits = [], [], []
 
         for model_name, model_class in model_classes.items():
             
             total = db.query(model_class.total_amount).order_by(asc(model_class.date)).offset(i).first()
             db_date = db.query(model_class.date).order_by(asc(model_class.date)).offset(i).first()
+            deposit = db.query(model_class.deposit_amount).order_by(asc(model_class.date)).offset(i).first()
 
-            if total:
-                total_value = total[0]
-                print(f'Value to be added from: {model_name}: {total}')
-                list_of_totals.append(total_value)
-            if db_date:
-                date_value = db_date[0]
-                print(f'Value to be added from: {model_name}: {date_value}')
-                list_of_dates.append(date_value)
+            if total and db_date and deposit:
+                list_of_totals.append(total[0])
+                list_of_dates.append(db_date[0])
+                list_of_deposits.append(deposit[0])
     
+        iteration_df = pd.DataFrame({
+            "Total_Value": list_of_totals,
+            "Date": list_of_dates,
+            "Deposits": list_of_deposits
+        })
 
-    output_df["Total_Value"] = pd.Series(list_of_totals)
-    output_df["Date"] = pd.Series(list_of_dates)
-    col_to_dis = ["Total_Value", "Date"]
-    print(output_df[col_to_dis])
-    output_df = output_df[col_to_dis]
+        data_frames.append(iteration_df)
+    print("Poza pentlo")
+    output_df = pd.concat(data_frames, ignore_index=True)
 
     grouped_df = output_df.groupby('Date').sum().reset_index()
-    print(grouped_df)
+    print(f" Printed grouped df: {grouped_df}")
+    return grouped_df
    
 
      
