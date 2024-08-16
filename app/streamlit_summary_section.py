@@ -54,6 +54,10 @@ def delete_portfolio(date_obj):
         st.error(f"Failed to process POST request: {response.status_code}")
         return []
 
+
+def calculate_profit_for_metric(df):
+    pass
+
     
 
 
@@ -93,24 +97,18 @@ def create_portfolio_summary_chart(df):
     st.plotly_chart(fig)
 
 def render_summary_section():
-    st.image('/Users/sylwestersojka/Documents/HomeBudget/app/belka.png')
-    st.markdown("<h1 style='text-align: center;'>Portfolio summary</h1>", unsafe_allow_html=True)
+
+    col1_title, col2_title = st.columns(2, vertical_alignment="bottom")
+    with col1_title:
+        st.markdown("<h1 style='text-align: center;'>Portfolio summary</h1>", unsafe_allow_html=True)
+    with col2_title:
+        st.metric(label='Profit since last month', value="180823", delta="-1223 zł (to be implemented xd)")
 
     portfolio_summary = generate_summary_overall()
     create_portfolio_summary_chart(portfolio_summary)
     
     portfolio_percentage = get_portfolio_perc()
 
-
-    col1, col2, col3 = st.columns(3, vertical_alignment="bottom")
-
-    with col1:
-        
-        button_clicked = st.button("Generate Monthly report")
-        if button_clicked:
-            print(f'BUTTON KLIKNIETY')
-            add_portfolio_entry()
-            st.rerun()
 
             
 

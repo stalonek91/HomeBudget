@@ -228,7 +228,7 @@ def get_time_delta(tab):
 def generate_wallet_tab(tab):
     st.write(f"{tab}")
 
-    st.image('/Users/sylwestersojka/Documents/HomeBudget/app/belka.png')
+    
     wallet_data = fetch_wallet_totals(tab)
     generate_wallet_chart_2nd_with_legend(wallet_data)
 
