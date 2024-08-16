@@ -56,7 +56,13 @@ def delete_portfolio(date_obj):
 
 
 def calculate_profit_for_metric(df):
-    pass
+
+    old, new = df[-2:]
+    val_to_dis = new['Total_Value'] - old['Total_Value']
+    month_diff = float(val_to_dis)
+    new_val = new['Total_Value']
+
+    return new_val, month_diff
 
     
 
@@ -97,35 +103,44 @@ def create_portfolio_summary_chart(df):
     st.plotly_chart(fig)
 
 def render_summary_section():
+    portfolio_summary = generate_summary_overall()
+    
 
-    col1_title, col2_title = st.columns(2, vertical_alignment="bottom")
+    col1_title, col2_title,  = st.columns(2, vertical_alignment="bottom")
     with col1_title:
         st.markdown("<h1 style='text-align: center;'>Portfolio summary</h1>", unsafe_allow_html=True)
     with col2_title:
-        st.metric(label='Profit since last month', value="180823", delta="-1223 zł (to be implemented xd)")
+        new_val, diff = calculate_profit_for_metric(portfolio_summary)
 
-    portfolio_summary = generate_summary_overall()
+        st.metric(label='Last update delta', value=f"{new_val} zł" , delta=f"{diff} zł")
+
+
+
+    
     create_portfolio_summary_chart(portfolio_summary)
     
     portfolio_percentage = get_portfolio_perc()
 
 
-            
+    col3,col4 = st.columns(2, vertical_alignment="center")
 
-#FIXME: fix refreshing problem
-    if portfolio_percentage:
+    with col3:
+        if portfolio_percentage:
 
-        df_perc = pd.DataFrame(portfolio_percentage)
-        fig = px.pie(
-        df_perc, values='Percentage', names='Wallet',
-        title='Portfolio split',
-        labels={'Wallet': 'Wallet'}
-        )
+            df_perc = pd.DataFrame(portfolio_percentage)
+            fig = px.pie(
+            df_perc, values='Percentage', names='Wallet',
+            title='Portfolio split',
+            labels={'Wallet': 'Wallet'}
+            )
 
-        # Update the traces
-        fig.update_traces(textposition='inside', textinfo='percent+label')
+            # Update the traces
+            fig.update_traces(textposition='inside', textinfo='percent+label')
 
-        # Show the figure
-        st.plotly_chart(fig)
+            # Show the figure
+            st.plotly_chart(fig)
+    
+    with col4:
+        st.write("Tu bedzie sekcja + - portfeli")
 
 
