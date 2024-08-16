@@ -57,60 +57,47 @@ def delete_portfolio(date_obj):
     
 
 
-def generate_summary_chart(df):
-    fig = go.Figure()
-
-    # Add a trace for the area chart
-    fig.add_trace(go.Scatter(
-        x=df['date'],
-        y=df['sum_of_acc'],
-        mode='lines+markers',
-        line=dict(color='#2E86C1', width=2),  # A pleasing blue color for the line
-        fill='tozeroy',  # Fill area to x-axis
-        fillcolor='rgba(46, 134, 193, 0.3)',  # Matching fill color with transparency
-        marker=dict(size=6, color='#2E86C1')  # Smaller, matching markers
-    ))
-
-    # Customize the layout
-    fig.update_layout(
-
-        xaxis_title=dict(
-            text='Date',
-            font=dict(size=14, family='Arial, sans-serif', color='#FFFFFF'),
-        ),
-        yaxis_title=dict(
-            text='Value',
-            font=dict(size=14, family='Arial, sans-serif', color='#FFFFFF'),
-        ),
-        xaxis=dict(
-            showgrid=True, gridcolor='rgba(255, 255, 255, 0.1)',  # Light grid lines
-            tickangle=-45,  # Rotate x-axis labels for better readability
-            color='#FFFFFF',
-            tickformat='%Y-%m-%d'  # Display only date without time
-        ),
-        yaxis=dict(
-            showgrid=True, gridcolor='rgba(255, 255, 255, 0.1)',  # Light grid lines
-            color='#FFFFFF'
-        ),
-        plot_bgcolor='#1E1E1E',  # Set background color to dark grey
-        paper_bgcolor='#1E1E1E',  # Set the paper background color
-        margin=dict(l=40, r=40, t=60, b=40),  # Adjust margins
-        height=400,  # Adjust the height of the chart
-    )
-
-    st.plotly_chart(fig)
 
 #NEW CHART FOR PORTFOLIO WITHOUT DB
 
 def create_portfolio_summary_chart(df):
-    raise NotImplementedError
+    dates  = [entry['Date'] for entry in df]
+    total_values  = [entry['Total_Value'] for entry in df]
+    total_deposits  = [entry['Deposits'] for entry in df]
+    profits = [total - deposit for total, deposit in zip(total_values, total_deposits)]
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        x=dates,
+        y=total_deposits,
+        name='Deposits',
+        marker=dict(color='lightblue'),
+    
+    ))
+
+    fig.add_trace(go.Bar(
+        x=dates, 
+        y=profits, 
+        name='Profit',
+        marker=dict(color='blue'),
+        text=total_values,
+        textposition='outside'
+        
+    ))
+
+    fig.update_layout(barmode='stack')
+    fig.update_xaxes(title_text='Date')
+    fig.update_yaxes(title_text='Value')
+
+    st.plotly_chart(fig)
 
 def render_summary_section():
     st.image('/Users/sylwestersojka/Documents/HomeBudget/app/belka.png')
     st.markdown("<h1 style='text-align: center;'>Portfolio summary</h1>", unsafe_allow_html=True)
 
     portfolio_summary = generate_summary_overall()
-    st.write(portfolio_summary)
+    create_portfolio_summary_chart(portfolio_summary)
     
     portfolio_percentage = get_portfolio_perc()
 
