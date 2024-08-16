@@ -8,6 +8,14 @@ import plotly.graph_objects as go
 
 FASTAPI_URL = 'http://127.0.0.1:8000'
 
+def generate_summary_overall():
+    response = requests.get(f"{FASTAPI_URL}/portfolio/generate_summary_overall")
+    if response.status_code == 200:
+        return response.json()
+    else:
+        st.error(f"Failed to fetch data: {response.status_code}")
+        return []
+
 def fetch_portfolio_summary():
     response = requests.get(f"{FASTAPI_URL}/portfolio/get_all_portfolio")
     if response.status_code == 200:
@@ -92,26 +100,20 @@ def generate_summary_chart(df):
 
     st.plotly_chart(fig)
 
+#NEW CHART FOR PORTFOLIO WITHOUT DB
+
+def create_portfolio_summary_chart(df):
+    raise NotImplementedError
+
 def render_summary_section():
     st.image('/Users/sylwestersojka/Documents/HomeBudget/app/belka.png')
     st.markdown("<h1 style='text-align: center;'>Portfolio summary</h1>", unsafe_allow_html=True)
 
-
-
-    portfolio_summary = fetch_portfolio_summary()
-    dates_to_delete = [d['date'] for d in portfolio_summary]
+    portfolio_summary = generate_summary_overall()
+    st.write(portfolio_summary)
+    
     portfolio_percentage = get_portfolio_perc()
 
-    if portfolio_summary:
-        df = pd.DataFrame(portfolio_summary)
-        generate_summary_chart(df)
-        st.dataframe(df)
-
-        
-        
-        
-    else:
-        st.warning("No data to display")
 
     col1, col2, col3 = st.columns(3, vertical_alignment="bottom")
 
@@ -123,23 +125,6 @@ def render_summary_section():
             add_portfolio_entry()
             st.rerun()
 
-    with col2:
-        
-        selected_portfolio_dates = st.multiselect(
-            "Select date for delete:",
-            dates_to_delete,
-            key="summary_dates_to_delete"
-        )
-
-
-    with col3:
-        
-        button_delete = st.button("Delete entry")
-        if button_delete:
-            if selected_portfolio_dates:
-                for date in selected_portfolio_dates:
-                    delete_portfolio(date)
-            st.rerun()
             
 
 #FIXME: fix refreshing problem

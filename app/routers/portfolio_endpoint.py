@@ -81,7 +81,7 @@ def get_all_portfolio(id: int, db: Session = Depends(get_sql_db)):
 # check if sum of last deposit per month can be added like n - n-1 
 
 
-@router.get("/generate_summary_overall",response_model=schemas.PortfolioSummarySchema, status_code=status.HTTP_200_OK)
+@router.get("/generate_summary_overall",response_model=List[schemas.PortfolioSummarySchema], status_code=status.HTTP_200_OK)
 def generate_summary_overall(db: Session = Depends(get_sql_db), model_classes = model_classes):
      
     data_frames = []
@@ -99,9 +99,9 @@ def generate_summary_overall(db: Session = Depends(get_sql_db), model_classes = 
             deposit = db.query(model_class.deposit_amount).order_by(asc(model_class.date)).offset(i).first()
 
             if total and db_date and deposit:
-                list_of_totals.append(total[0])
+                list_of_totals.append(float(total[0]))
                 list_of_dates.append(db_date[0])
-                list_of_deposits.append(deposit[0])
+                list_of_deposits.append(float(deposit[0]))
     
         iteration_df = pd.DataFrame({
             "Total_Value": list_of_totals,
@@ -110,12 +110,15 @@ def generate_summary_overall(db: Session = Depends(get_sql_db), model_classes = 
         })
 
         data_frames.append(iteration_df)
-    print("Poza pentlo")
+    
     output_df = pd.concat(data_frames, ignore_index=True)
 
     grouped_df = output_df.groupby('Date').sum().reset_index()
-    print(f" Printed grouped df: {grouped_df}")
-    return grouped_df
+    # print(f" Printed grouped df: {grouped_df}")
+    #Converting DF to the list
+    list_df = grouped_df.to_dict(orient='records')
+    print(f'OUTPUT: {list_df}')
+    return list_df
    
 
      

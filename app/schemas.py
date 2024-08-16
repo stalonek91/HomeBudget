@@ -76,21 +76,12 @@ class ReturnDate(BaseModel):
 
 class PortfolioSummarySchema(BaseModel):
     id: Optional[int] = None
-    date: date
-    sum_of_acc: float
-    last_update_profit: float
-    sum_of_deposits: float
-    all_time_profit: float
-
-    class Config:
-        orm_mode = True
-
-class ShortPortfolioSchema(BaseModel):
-    
     Date: date
     Total_Value: float
+    Deposits: float
 
 
     class Config:
         orm_mode = True
+
 
