@@ -9,7 +9,7 @@ import plotly.graph_objects as go
 FASTAPI_URL = 'http://127.0.0.1:8000'
 
 def generate_summary_overall():
-    response = requests.get(f"{FASTAPI_URL}/portfolio/generate_summary_overall")
+    response = requests.post(f"{FASTAPI_URL}/portfolio/generate_summary_overall")
     if response.status_code == 200:
         return response.json()
     else:
@@ -82,18 +82,24 @@ def create_portfolio_summary_chart(df):
         x=dates,
         y=total_deposits,
         name='Deposits',
-        marker=dict(color='lightblue'),
-    
+        marker=dict(
+            color='rgba(70, 130, 180, 0.8)',  # steelblue with some transparency
+            line=dict(color='rgba(70, 130, 180, 1.0)', width=2)  # darker border
+        ),
+        hoverinfo='y'
     ))
 
     fig.add_trace(go.Bar(
         x=dates, 
         y=profits, 
         name='Profit',
-        marker=dict(color='blue'),
-        text=total_values,
-        textposition='outside'
-        
+        marker=dict(
+            color='rgba(0, 128, 0, 0.8)',  # green with some transparency
+            line=dict(color='rgba(0, 128, 0, 1.0)', width=2)  # darker border
+        ),
+        text=[f'{val:,.2f}' for val in total_values],  # format text with commas and two decimals
+        textposition='outside',
+        hoverinfo='y'
     ))
 
     fig.update_layout(barmode='stack')

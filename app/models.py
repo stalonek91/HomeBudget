@@ -1,7 +1,7 @@
 from app.database import Base
 
 from sqlalchemy.sql.expression import text
-from sqlalchemy import Column, Integer, Text, String, Boolean, DateTime, Date, Numeric
+from sqlalchemy import Column, Integer, Text, String, Boolean, DateTime, Date, Numeric, Computed
 
 
 class Transaction(Base):
@@ -103,9 +103,8 @@ class PortfolioSummary(Base):
     __tablename__ = "portfolio"
     
     id = Column(Integer, primary_key=True, index=True)
-    date = Column(Date, nullable=False)
-    sum_of_acc = Column(Numeric(10, 2), nullable=False)
-    last_update_profit = Column(Numeric(10, 2), nullable=False)
-    sum_of_deposits = Column(Numeric(10, 2), nullable=False)
-    all_time_profit = Column(Numeric(10, 2), nullable=False)
+    Date = Column(Date, nullable=False)
+    Total_Value = Column(Numeric(10, 2), nullable=False)
+    Deposits = Column(Numeric(10, 2), nullable=False)
+    Profit = Column(Numeric(10,2), Computed('"Total_Value" - "Deposits"', persisted=True), nullable=True)
     

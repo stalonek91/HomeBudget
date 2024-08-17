@@ -74,16 +74,10 @@ def get_all_portfolio(id: int, db: Session = Depends(get_sql_db)):
 
 
 
-    
-#TODO: implement generate_portfolio_entry function
-# columns from each table with total amount
-#'total_amount'
-# check if sum of last deposit per month can be added like n - n-1 
 
-
-@router.get("/generate_summary_overall",response_model=List[schemas.PortfolioSummarySchema], status_code=status.HTTP_200_OK)
+@router.post("/generate_summary_overall",response_model=List[schemas.PortfolioSummarySchema], status_code=status.HTTP_200_OK)
 def generate_summary_overall(db: Session = Depends(get_sql_db), model_classes = model_classes):
-     
+
     data_frames = []
 
     N = db.query(model_classes['Etoro']).count()
@@ -114,57 +108,15 @@ def generate_summary_overall(db: Session = Depends(get_sql_db), model_classes = 
     output_df = pd.concat(data_frames, ignore_index=True)
 
     grouped_df = output_df.groupby('Date').sum().reset_index()
-    # print(f" Printed grouped df: {grouped_df}")
-    #Converting DF to the list
+
     list_df = grouped_df.to_dict(orient='records')
-    print(f'OUTPUT: {list_df}')
+
+    transaction_service = TransactionService(db)
+    inserted_data = transaction_service.add_transactions(model_class=models.PortfolioSummary, transaction_data=list_df)
+
+    print(f'OUTPUT: {inserted_data}')
     return list_df
    
-
-     
-
-
-@router.post("/generate_summary",response_model=schemas.PortfolioSummarySchema, status_code=status.HTTP_201_CREATED)
-def generate_summary(db: Session = Depends(get_sql_db), model_classes = model_classes):
-     
-    list_of_totals = []
-    list_of_deposits = []
-    todays_date = datetime.today().strftime('%Y-%m-%d')
-    result_dict = {}
-    
-
-    for model_name, model_class in model_classes.items():
-         total = db.query(model_class.total_amount).order_by(desc(model_class.date)).first()
-         if total:
-              list_of_totals.append(total[0])
-
-    for model_name, model_class in model_classes.items():
-         deposit_amm = db.query(model_class.deposit_amount).order_by(desc(model_class.date)).first()
-         print(f"Type of deposit_amm is: {type(deposit_amm)}")
-         if deposit_amm:
-              deposit_amm = int(deposit_amm[0])
-              list_of_deposits.append(deposit_amm)
-
-    sum_of_totals = sum(list_of_totals)
-    sum_of_deposits = sum(list_of_deposits)
-
-    last_total_entry = db.query(models.PortfolioSummary).order_by(desc(models.PortfolioSummary.date)).offset(0).first()
-    value_last_total_entry = last_total_entry.sum_of_acc if last_total_entry else None
-
-
-    print(sum_of_deposits)
-    transaction_data = {    
-        'date': todays_date,
-        'sum_of_acc': sum_of_totals,
-        'last_update_profit': sum_of_totals-value_last_total_entry if value_last_total_entry else 0,
-        'sum_of_deposits': sum_of_deposits,
-        'all_time_profit': sum_of_totals-sum_of_deposits}
-
-    transaction = TransactionService(db)
-    transaction.add_transaction(model_class=models.PortfolioSummary, transaction_data=transaction_data)
-
-    print(sum(list_of_totals))
-    return transaction_data
 
 
 
