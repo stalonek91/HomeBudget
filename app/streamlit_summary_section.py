@@ -56,13 +56,15 @@ def delete_portfolio(date_obj):
 
 
 def calculate_profit_for_metric(df):
-
+    print(df)
     old, new = df[-2:]
     val_to_dis = new['Total_Value'] - old['Total_Value']
+    deposits_to_dis = new['Deposits'] - old['Deposits']
     month_diff = float(val_to_dis)
     new_val = new['Total_Value']
+    all_deposits = new['Deposits']
 
-    return new_val, month_diff
+    return new_val, month_diff, deposits_to_dis, all_deposits
 
     
 
@@ -110,15 +112,21 @@ def create_portfolio_summary_chart(df):
 
 def render_summary_section():
     portfolio_summary = generate_summary_overall()
+    st.markdown("<h1 style='text-align: center;'>Portfolio summary</h1>", unsafe_allow_html=True)
     
 
-    col1_title, col2_title,  = st.columns(2, vertical_alignment="bottom")
+    col1_title, col2_title, col3_title  = st.columns(3, vertical_alignment="bottom")
+    new_val, diff, deposits_diff, all_deposits = calculate_profit_for_metric(portfolio_summary)
     with col1_title:
-        st.markdown("<h1 style='text-align: center;'>Portfolio summary</h1>", unsafe_allow_html=True)
+        
+        st.metric(label='Total Value update', value=f"{new_val} zł" , delta=f"{diff} zł")
+        
     with col2_title:
-        new_val, diff = calculate_profit_for_metric(portfolio_summary)
+        
+        st.metric(label='Sum of deposits update', value=f"{all_deposits} zł" , delta=f"{deposits_diff} zł")
 
-        st.metric(label='Last update delta', value=f"{new_val} zł" , delta=f"{diff} zł")
+    with col3_title:
+        st.write("TBU")
 
 
 
