@@ -103,7 +103,7 @@ class PortfolioSummary(Base):
     __tablename__ = "portfolio"
     
     id = Column(Integer, primary_key=True, index=True)
-    Date = Column(Date, nullable=False)
+    Date = Column(Date, nullable=False, unique=True)
     Total_Value = Column(Numeric(10, 2), nullable=False)
     Deposits = Column(Numeric(10, 2), nullable=False)
     Profit = Column(Numeric(10,2), Computed('"Total_Value" - "Deposits"', persisted=True), nullable=True)
