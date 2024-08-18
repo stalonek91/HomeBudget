@@ -133,14 +133,24 @@ def generate_wallet_chart_2nd_with_legend(wallet_data):
         x=df['date'], 
         y=df['deposit_amount'], 
         name='Deposit Amount',
-        marker=dict(color='lightblue')
+        marker=dict(
+            color='rgba(70, 130, 180, 0.8)',  # steelblue with some transparency
+            line=dict(color='rgba(70, 130, 180, 1.0)', width=2)  # darker border
+        ),
+        hoverinfo='y'
     ))
 
     fig.add_trace(go.Bar(
         x=df['date'], 
         y=df['profit'], 
         name='Profit',
-        marker=dict(color=df['color'])
+        marker=dict(
+            color='rgba(0, 128, 0, 0.8)',  # green with some transparency
+            line=dict(color='rgba(0, 128, 0, 1.0)', width=2)  # darker border
+        ),
+        text=[f'{val:,.2f}' for val in df['total_amount']],  # format text with commas and two decimals
+        textposition='outside',
+        hoverinfo='y'
     ))
 
     fig.add_trace(go.Scatter(
@@ -153,7 +163,7 @@ def generate_wallet_chart_2nd_with_legend(wallet_data):
     ))
 
     y_min = df['total_amount'].min() * 0.95
-    y_max = df['total_amount'].min() * 1.15
+    y_max = df['total_amount'].max() * 1.05
 
     fig.update_layout(
         barmode='stack',
@@ -162,7 +172,7 @@ def generate_wallet_chart_2nd_with_legend(wallet_data):
         title='Wallet Chart',
         yaxis=dict(range=[y_min, y_max]),
         xaxis=dict(
-            tickformat="%Y-%m-%d",
+            tickformat="%b %Y",  # Adjusted to display month and year more clearly
             tickmode="array",
             tickvals=df['date'].tolist(),
         )
