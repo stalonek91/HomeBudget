@@ -1,10 +1,17 @@
 import pandas as pd
+import json
 
 
 
 class CSVHandler:
 
+    dict_of_rules = {}
+
     def __init__(self, df: pd.DataFrame = None) -> None:
+
+        self.load_rules()
+
+        
 
         self.df = df
         self.columns_to_keep = [
@@ -22,6 +29,19 @@ class CSVHandler:
                                 'transaction_type',
                                 'category',
                                 'ref_number']
+        
+    def load_rules(self):
+        try:
+            with open('rules_dict.json', 'r') as file:
+                CSVHandler.dict_of_rules = json.load(file)
+        except Exception as e:
+            print(f'ERROR: Something went wrong loading the json file with rules. Details: {str(e)}')
+
+    def save_rules(self):
+        with open('rules_dict.json', 'w') as file:
+            json.dump(CSVHandler.dict_of_rules, file)
+            print(f'INFO: Rule JSON file saved succesfully')
+
 
     def load_csv(self):
         try:
@@ -78,23 +98,21 @@ class CSVHandler:
 
 
     def remove_dupl(self, df):
-
-        dict_of_words = {
-        "Zabka": ["ZABKA Z"],
-        "Stacja Paliw": ["STACJA PAL"],
-        "Buk": ["ETOTO.PL", "FORTUNA", "BETCLIC", "BUKMAC", "TOTALBET"],
-        "Revolut": ["REVOL"],
-        "Lidl": ["SKLEP LIDL"]
-    }
-
-        for category, patterns in dict_of_words.items():
+ 
+        for category, patterns in CSVHandler.dict_of_rules.items():
             df['receiver'] = df['receiver'].apply(
                 lambda x: category if any (pattern in x for pattern in patterns) else x
             )
-
-        
-
         return df
+    
+    def add_rule(self, rule_key, rule_value):
+        if rule_key in CSVHandler.dict_of_rules:
+            CSVHandler.dict_of_rules[rule_key].append(rule_value)
+        else:
+            CSVHandler.dict_of_rules[rule_key] = [rule_value]
+        self.save_rules()
+        print(f"New rule added: {rule_key} -> {rule_value}")
+
 
 
 

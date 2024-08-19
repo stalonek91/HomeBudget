@@ -6,7 +6,7 @@ from csv_handler import CSVHandler
 
 FASTAPI_URL = 'http://127.0.0.1:8000'
 
-#TODO: To add some varaible stored in session that will unblock the button
+
 def add_csv_to_db(file):
 
     files = {"file": (file.name, file, "text/csv")}
@@ -39,7 +39,7 @@ def render_transaction_section():
             print(f'2/2::: Code after file uploading')
             
             all_transactions = get_all_transactions()
-            print(all_transactions)
+            
             
 
             if uploaded_file is not None:
@@ -51,7 +51,6 @@ def render_transaction_section():
 
             if all_transactions:
                 df_tr = pd.DataFrame(all_transactions)
-                print(f"df_tr loaded: {df_tr.head(5)}")
 
                 if not df_tr.empty and 'receiver' in df_tr.columns:
                     df_tr = csv_handler.remove_dupl(df=df_tr)
@@ -98,3 +97,13 @@ def render_transaction_section():
                 grouped_df.index.name = "Row Number"
 
                 st.dataframe(grouped_df)
+
+            add_left, add_middle, add_right = st.columns(3, vertical_alignment="bottom")
+            
+            rule_key = add_left.text_input("New Value:")
+            rule_val = add_middle.text_input("Text to replace (contain New Value):")
+
+            if add_right.button("Add Rule", use_container_width=True):
+                print(f"Pressing add rule button adding folowing key:{rule_key} and val:{rule_val}")
+                csv_handler.add_rule(rule_key=rule_key, rule_value=rule_val)
+                st.rerun()
