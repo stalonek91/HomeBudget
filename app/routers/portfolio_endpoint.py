@@ -22,7 +22,22 @@ model_classes = {
     'Nokia': models.Nokia
 }
 
-#TODO: Implementing % of total portfolio
+@router.get("/get_profit",response_model=schemas.ReturnProfit, status_code=status.HTTP_200_OK)
+def get_profit(db: Session = Depends(get_sql_db)):
+    profit_query = db.query(models.PortfolioSummary.Profit).order_by(desc(models.PortfolioSummary.Date)).first()
+    second_profit_query = db.query(models.PortfolioSummary.Profit).order_by(desc(models.PortfolioSummary.Date)).offset(1).first()
+
+    delta = profit_query[0] - second_profit_query[0]
+    delta = float(delta)
+    profit_query = float(profit_query[0])
+
+    print(f'Val: {profit_query} type: {type(profit_query)}')
+    print(f'Val: {delta} type: {type(delta)}')
+
+    return {"profit": profit_query, "profit_delta": delta}
+    
+               
+
 
 @router.get("/calculate_perc/", status_code=status.HTTP_200_OK)
 def calculate_perc(db: Session = Depends(get_sql_db), model_classes=model_classes):

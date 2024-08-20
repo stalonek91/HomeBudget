@@ -71,6 +71,10 @@ class ReturnSummary(BaseModel):
         income: float
         expenses: float
 
+class ReturnProfit(BaseModel):
+        profit: float
+        profit_delta: float
+
 class ReturnDate(BaseModel):
     date: date
 

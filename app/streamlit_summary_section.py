@@ -8,6 +8,15 @@ import plotly.graph_objects as go
 
 FASTAPI_URL = 'http://127.0.0.1:8000'
 
+def get_profit():
+    response = requests.get(f"{FASTAPI_URL}/portfolio/get_profit")
+    if response.status_code == 200:
+        return response.json()
+    else:
+        st.error(f"Failed to fetch data: {response.status_code}")
+        return []
+
+
 def generate_summary_overall():
     response = requests.post(f"{FASTAPI_URL}/portfolio/generate_summary_overall")
     if response.status_code == 200:
@@ -63,8 +72,10 @@ def calculate_profit_for_metric(df):
     month_diff = float(val_to_dis)
     new_val = new['Total_Value']
     all_deposits = new['Deposits']
+    all_profit = new['Total_Value'] - new['Deposits']
+    profit_delta = all_profit - (old['Total_Value'] - old['Deposits'])
 
-    return new_val, month_diff, deposits_to_dis, all_deposits
+    return new_val, month_diff, deposits_to_dis, all_deposits, all_profit, profit_delta
 
     
 
@@ -116,17 +127,22 @@ def render_summary_section():
     
 
     col1_title, col2_title, col3_title  = st.columns(3, vertical_alignment="bottom")
-    new_val, diff, deposits_diff, all_deposits = calculate_profit_for_metric(portfolio_summary)
+    new_val, diff, deposits_diff, all_deposits, all_profit, profit_delta = calculate_profit_for_metric(portfolio_summary)
+    
     with col1_title:
         
         st.metric(label='Total Value update', value=f"{new_val} zł" , delta=f"{diff} zł")
         
     with col2_title:
+        profit_func = get_profit()
+        profit = profit_func["profit"]
+        profit_delta = profit_func["profit_delta"]
+        st.metric(label='Profit', value=f"{profit} zł" , delta=f"{profit_delta} zł")
         
-        st.metric(label='Sum of deposits update', value=f"{all_deposits} zł" , delta=f"{deposits_diff} zł")
 
     with col3_title:
-        st.write("TBU")
+        st.metric(label='Sum of deposits update', value=f"{all_deposits} zł" , delta=f"{deposits_diff} zł")
+        
 
 
 

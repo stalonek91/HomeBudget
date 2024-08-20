@@ -1,1 +1,35 @@
-{"Rata kredytu APPLE": ["ALIOR"], "Autostrada oplata": ["BALICE", "BRZECZKOWICE"], "Allegro": ["ALLEGRO"], "Apple": ["APPLE"], "Zakupy spozywcze": ["AUCHAN", "CARREF", "LIDL", "COCKPEAT"], "Rachunki / online": ["AUTOPAY", "ZEC SERV", "RYNKOWSKI", "NEDERLANDE"], "Buk": ["BETCLIC", "TOTALBET", "TOTALBET", "ETOTO", "FORBET", "FORTUNA", "REVOLUT"], "Bilety zbiorkom": ["URBANCARD"], "Oszczednosciowe/Inwestycje": ["BIURO MAKLERSKIE", "XTB"], "Wycieczki/Hotel": ["BOOKING", "PARKHOTEL"], "Bolt": ["BOLT"], "BP stacja": ["BP-"], "ZABKA": ["ZABKA"], "Castorama": ["CASTORAMA"], "Rozrywka": ["ENERGYLANDIA", "HALA ARENA"], "Wyjscie na miasto": ["FORMA PLYNNA", "CHARLOTTE", "MCDONAL"], "Platne subskrypcje": ["MAX.COM", "CHATGPT"], "Wyposazenie domu": ["IKEA", "LEROY"], "Fryzjer": ["KAMIL BODA"], "Zdrowie/Uroda": ["HEBE"], "Kwiaciarnia": ["KWIACIARNIA"], "Elektronika": ["MEDIA MARKT"], "Parking": ["NFM APM", "PARKING"], "Rachunki Online": ["PAYPRO"], "Ciuchy": ["WITTCHEN"]}
+{
+  "Rata kredytu APPLE": ["ALIOR"],
+  "Autostrada oplata": ["BALICE", "BRZECZKOWICE"],
+  "Allegro": ["ALLEGRO"],
+  "Apple": ["APPLE"],
+  "Zakupy spozywcze": ["AUCHAN", "CARREF", "LIDL", "COCKPEAT"],
+  "Rachunki / online": ["AUTOPAY", "ZEC SERV", "RYNKOWSKI", "NEDERLANDE"],
+  "Buk": [
+    "BETCLIC",
+    "TOTALBET",
+    "TOTALBET",
+    "ETOTO",
+    "FORBET",
+    "FORTUNA",
+    "REVOLUT"
+  ],
+  "Bilety zbiorkom": ["URBANCARD"],
+  "Oszczednosciowe/Inwestycje": ["BIURO MAKLERSKIE", "XTB"],
+  "Wycieczki/Hotel": ["BOOKING", "PARKHOTEL"],
+  "Bolt": ["BOLT"],
+  "BP stacja": ["BP-"],
+  "ZABKA": ["ZABKA"],
+  "Castorama": ["CASTORAMA"],
+  "Rozrywka": ["ENERGYLANDIA", "HALA ARENA"],
+  "Wyjscie na miasto": ["FORMA PLYNNA", "CHARLOTTE", "MCDONAL"],
+  "Platne subskrypcje": ["MAX.COM", "CHATGPT"],
+  "Wyposazenie domu": ["IKEA", "LEROY"],
+  "Fryzjer": ["KAMIL BODA"],
+  "Zdrowie/Uroda": ["HEBE"],
+  "Kwiaciarnia": ["KWIACIARNIA"],
+  "Elektronika": ["MEDIA MARKT"],
+  "Parking": ["NFM APM", "PARKING"],
+  "Rachunki Online": ["PAYPRO"],
+  "Ciuchy": ["WITTCHEN"]
+}

@@ -11,6 +11,7 @@ from app.transaction_service import TransactionService
 router = APIRouter(tags=["obligacje_endpoints"], prefix="/obligacje")
 
 
+
 @router.put("/update_obligacje/{id}", response_model=schemas.PortfolioTransaction, status_code=status.HTTP_202_ACCEPTED)
 def update_obligacje(id: int, obligacje_body: schemas.UpdatePortfolioTransaction = Body(...), db: Session = Depends(get_sql_db)):
     print(f'FUNCTION:PUT: /update_obligacje/{id} ')
