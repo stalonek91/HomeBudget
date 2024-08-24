@@ -46,6 +46,17 @@ delete_transaction_endpoints = {
     "XTB" : "/xtb/delete_xtb/"
 }
 
+
+def get_wallet_all(tab):
+    endpoint = wallet_endpoints[tab]
+    response = requests.get(f"{FASTAPI_URL}{endpoint}")
+
+    if response.status_code == 200:
+        return response.json()
+    else:
+        st.error(f"Failed to fetch data: {response.status_code}")
+        return []
+
 def get_wallet_dates(tab):
 
     endpoint = date_wallet_endpoints[tab]
@@ -234,9 +245,44 @@ def get_time_delta(tab):
     
     return all_dates
 
+def get_wallet_metrics(df, tab):
+    wallet_data = fetch_wallet_totals(tab)
+    last_entry, last_month_entry = wallet_data[-1], wallet_data[-2]
+    
+    total_amount = last_entry['total_amount']
+    total_deposits = last_entry['deposit_amount']
+    total_profit = total_amount-total_deposits
+
+    last_month_total = last_month_entry['total_amount']
+    last_moth_deposits = last_month_entry['deposit_amount']
+    last_month_profit = last_month_total-last_moth_deposits
+
+    total_delta = total_amount - last_month_total
+    deposits_delta = total_deposits - last_moth_deposits
+    profot_delta = total_profit - last_month_profit
+
+    return total_amount, total_deposits, total_profit, total_delta, deposits_delta, profot_delta
+    
+    
 
 def generate_wallet_tab(tab):
-    st.write(f"{tab}")
+    st.title(f"{tab}")
+    wallet_data = fetch_wallet_totals(tab)
+    get_wallet_metrics(df=wallet_data, tab=tab)
+
+    wallet_total, wallet_deposits, wallet_profit, total_delta, deposits_delta, profot_delta  = get_wallet_metrics(df=wallet_data, tab=tab)
+    
+
+    metric1, metric2, metric3 = st.columns(3, vertical_alignment="bottom")
+
+    with metric1:
+        st.metric(label='Total Value', value=f"{wallet_total} PLN" , delta=f"{total_delta} PLN")
+
+    with metric2:
+        st.metric(label='Total deposits', value=f"{wallet_deposits} PLN" , delta=f"{deposits_delta} PLN last month")
+    
+    with metric3:
+        st.metric(label='Total Profit', value=f"{wallet_profit} PLN" , delta=f"{profot_delta} PLN last month")
 
     
     wallet_data = fetch_wallet_totals(tab)
