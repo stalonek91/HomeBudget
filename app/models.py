@@ -27,7 +27,7 @@ class Etoro(Base):
     initial_amount = Column(Numeric(10, 2), nullable=False)
     deposit_amount = Column(Numeric(10, 2), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
-    growth_percentage = Column(Numeric(5, 2), nullable=True)
+    
 
 class Xtb(Base):
 
@@ -38,7 +38,7 @@ class Xtb(Base):
     initial_amount = Column(Numeric(10, 2), nullable=False)
     deposit_amount = Column(Numeric(10, 2), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
-    growth_percentage = Column(Numeric(5, 2), nullable=True)
+    
 
 
 class Vienna(Base):
@@ -61,7 +61,7 @@ class Revolut(Base):
     initial_amount = Column(Numeric(10, 2), nullable=False)
     deposit_amount = Column(Numeric(10, 2), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
-    growth_percentage = Column(Numeric(5, 2), nullable=True)
+    
 
 class Obligacje(Base):
 
@@ -72,7 +72,7 @@ class Obligacje(Base):
     initial_amount = Column(Numeric(10, 2), nullable=False)
     deposit_amount = Column(Numeric(10, 2), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
-    growth_percentage = Column(Numeric(5, 2), nullable=True)
+    
 
 
 class Generali(Base):
@@ -84,7 +84,7 @@ class Generali(Base):
     initial_amount = Column(Numeric(10, 2), nullable=False)
     deposit_amount = Column(Numeric(10, 2), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
-    growth_percentage = Column(Numeric(5, 2), nullable=True)
+    
 
 class Nokia(Base):
 
@@ -95,7 +95,7 @@ class Nokia(Base):
     initial_amount = Column(Numeric(10, 2), nullable=False)
     deposit_amount = Column(Numeric(10, 2), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
-    growth_percentage = Column(Numeric(5, 2), nullable=True)
+    
 
 
 class PortfolioSummary(Base):

@@ -9,7 +9,7 @@ class UpdatePortfolioTransaction(BaseModel):
     initial_amount: Optional[float]
     deposit_amount: Optional[float]
     total_amount: Optional[float]
-    growth_percentage: Optional[float] = None
+    
 
 class PortfolioTransaction(BaseModel):
 
@@ -18,7 +18,7 @@ class PortfolioTransaction(BaseModel):
     initial_amount: float
     deposit_amount: float
     total_amount: float
-    growth_percentage: Optional[float] = None
+    
 
     class Config:
         orm_mode = True

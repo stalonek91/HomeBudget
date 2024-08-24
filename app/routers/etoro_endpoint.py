@@ -49,8 +49,7 @@ def add_many_etoro(etoro_entries: List[schemas.PortfolioTransaction] ,db: Sessio
 
     etoro_dicts = []
     for entity in etoro_entries:
-            initial_total = entity.initial_amount + entity.deposit_amount
-            entity.growth_percentage = ((entity.total_amount - (entity.initial_amount + entity.deposit_amount)) / initial_total) * 100
+            
             etoro_dict = entity.model_dump()
             etoro_dicts.append(etoro_dict)
             
@@ -64,13 +63,12 @@ def add_many_etoro(etoro_entries: List[schemas.PortfolioTransaction] ,db: Sessio
     
 @router.post("/add_etoro_transaction", response_model=schemas.PortfolioTransaction, status_code=status.HTTP_201_CREATED)
 def add_etoro_transaction(etoro: schemas.PortfolioTransaction, db: Session = Depends(get_sql_db)):
-    initial_total = etoro.initial_amount + etoro.deposit_amount
-    growth_percentage = ((etoro.total_amount - (etoro.initial_amount + etoro.deposit_amount)) / initial_total) * 100
+   
 
     etoro_entry = models.Etoro(
             **etoro.model_dump()
     )
-    etoro_entry.growth_percentage = growth_percentage
+    
 
     db.add(etoro_entry)
     db.commit()

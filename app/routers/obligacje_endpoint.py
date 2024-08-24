@@ -44,8 +44,7 @@ def add_many_obligacje(obligacje_entries: List[schemas.PortfolioTransaction] ,db
 
     obligacje_dicts = []
     for entity in obligacje_entries:
-            initial_total = entity.initial_amount + entity.deposit_amount
-            entity.growth_percentage = ((entity.total_amount - (entity.initial_amount + entity.deposit_amount)) / initial_total) * 100
+            
             obligacje_dict = entity.model_dump()
             obligacje_dicts.append(obligacje_dict)
             
@@ -59,13 +58,12 @@ def add_many_obligacje(obligacje_entries: List[schemas.PortfolioTransaction] ,db
     
 @router.post("/add_obligacje_transaction", response_model=schemas.PortfolioTransaction, status_code=status.HTTP_201_CREATED)
 def add_obligacje_transaction(obligacje: schemas.PortfolioTransaction, db: Session = Depends(get_sql_db)):
-    initial_total = obligacje.initial_amount + obligacje.deposit_amount
-    growth_percentage = ((obligacje.total_amount - (obligacje.initial_amount + obligacje.deposit_amount)) / initial_total) * 100
+    
 
     obligacje_entry = models.Obligacje(
             **obligacje.model_dump()
     )
-    obligacje_entry.growth_percentage = growth_percentage
+    
 
     db.add(obligacje_entry)
     db.commit()

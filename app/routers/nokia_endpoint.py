@@ -43,8 +43,7 @@ def add_many_nokia(nokia_entries: List[schemas.PortfolioTransaction] ,db: Sessio
 
     nokia_dicts = []
     for entity in nokia_entries:
-            initial_total = entity.initial_amount + entity.deposit_amount
-            entity.growth_percentage = ((entity.total_amount - (entity.initial_amount + entity.deposit_amount)) / initial_total) * 100
+            
             nokia_dict = entity.model_dump()
             nokia_dicts.append(nokia_dict)
             
@@ -58,13 +57,12 @@ def add_many_nokia(nokia_entries: List[schemas.PortfolioTransaction] ,db: Sessio
     
 @router.post("/add_nokia_transaction", response_model=schemas.PortfolioTransaction, status_code=status.HTTP_201_CREATED)
 def add_nokia_transaction(nokia: schemas.PortfolioTransaction, db: Session = Depends(get_sql_db)):
-    initial_total = nokia.initial_amount + nokia.deposit_amount
-    growth_percentage = ((nokia.total_amount - (nokia.initial_amount + nokia.deposit_amount)) / initial_total) * 100
+    
 
     nokia_entry = models.Nokia(
             **nokia.model_dump()
     )
-    nokia_entry.growth_percentage = growth_percentage
+    
 
     db.add(nokia_entry)
     db.commit()

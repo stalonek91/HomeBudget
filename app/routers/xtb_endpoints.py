@@ -43,8 +43,7 @@ def add_many_xtb(xtb_entries: List[schemas.PortfolioTransaction] ,db: Session = 
 
     xtb_dicts = []
     for entity in xtb_entries:
-            initial_total = entity.initial_amount + entity.deposit_amount
-            entity.growth_percentage = ((entity.total_amount - (entity.initial_amount + entity.deposit_amount)) / initial_total) * 100
+            
             xtb_dict = entity.model_dump()
             xtb_dicts.append(xtb_dict)
             
@@ -58,13 +57,12 @@ def add_many_xtb(xtb_entries: List[schemas.PortfolioTransaction] ,db: Session = 
     
 @router.post("/add_xtb_transaction", response_model=schemas.PortfolioTransaction, status_code=status.HTTP_201_CREATED)
 def add_xtb_transaction(xtb: schemas.PortfolioTransaction, db: Session = Depends(get_sql_db)):
-    initial_total = xtb.initial_amount + xtb.deposit_amount
-    growth_percentage = ((xtb.total_amount - (xtb.initial_amount + xtb.deposit_amount)) / initial_total) * 100
+    
 
     xtb_entry = models.Xtb(
             **xtb.model_dump()
     )
-    xtb_entry.growth_percentage = growth_percentage
+    
 
     db.add(xtb_entry)
     db.commit()

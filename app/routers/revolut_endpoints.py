@@ -43,8 +43,7 @@ def add_many_revolut(revolut_entries: List[schemas.PortfolioTransaction] ,db: Se
 
     revolut_dicts = []
     for entity in revolut_entries:
-            initial_total = entity.initial_amount + entity.deposit_amount
-            entity.growth_percentage = ((entity.total_amount - (entity.initial_amount + entity.deposit_amount)) / initial_total) * 100
+            
             revolut_dict = entity.model_dump()
             revolut_dicts.append(revolut_dict)
             
@@ -58,13 +57,12 @@ def add_many_revolut(revolut_entries: List[schemas.PortfolioTransaction] ,db: Se
     
 @router.post("/add_revolut_transaction", response_model=schemas.PortfolioTransaction, status_code=status.HTTP_201_CREATED)
 def add_revolut_transaction(revolut: schemas.PortfolioTransaction, db: Session = Depends(get_sql_db)):
-    initial_total = revolut.initial_amount + revolut.deposit_amount
-    growth_percentage = ((revolut.total_amount - (revolut.initial_amount + revolut.deposit_amount)) / initial_total) * 100
+    
 
     revolut_entry = models.Revolut(
             **revolut.model_dump()
     )
-    revolut_entry.growth_percentage = growth_percentage
+    
 
     db.add(revolut_entry)
     db.commit()

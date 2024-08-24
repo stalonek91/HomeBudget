@@ -49,8 +49,7 @@ def add_many_vienna(vienna_entries: List[schemas.PortfolioTransaction] ,db: Sess
 
     vienna_dicts = []
     for entity in vienna_entries:
-            initial_total = entity.initial_amount + entity.deposit_amount
-            entity.growth_percentage = ((entity.total_amount - (entity.initial_amount + entity.deposit_amount)) / initial_total) * 100
+            
             vienna_dict = entity.model_dump()
             vienna_dicts.append(vienna_dict)
             
@@ -64,13 +63,12 @@ def add_many_vienna(vienna_entries: List[schemas.PortfolioTransaction] ,db: Sess
     
 @router.post("/add_vienna_transaction", response_model=schemas.PortfolioTransaction, status_code=status.HTTP_201_CREATED)
 def add_vienna_transaction(vienna: schemas.PortfolioTransaction, db: Session = Depends(get_sql_db)):
-    initial_total = vienna.initial_amount + vienna.deposit_amount
-    growth_percentage = ((vienna.total_amount - (vienna.initial_amount + vienna.deposit_amount)) / initial_total) * 100
+    
 
     vienna_entry = models.Vienna(
             **vienna.model_dump()
     )
-    vienna_entry.growth_percentage = growth_percentage
+    
 
     db.add(vienna_entry)
     db.commit()

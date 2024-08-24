@@ -43,8 +43,7 @@ def add_many_generali(generali_entries: List[schemas.PortfolioTransaction] ,db: 
 
     generali_dicts = []
     for entity in generali_entries:
-            initial_total = entity.initial_amount + entity.deposit_amount
-            entity.growth_percentage = ((entity.total_amount - (entity.initial_amount + entity.deposit_amount)) / initial_total) * 100
+            
             generali_dict = entity.model_dump()
             generali_dicts.append(generali_dict)
             
@@ -58,13 +57,12 @@ def add_many_generali(generali_entries: List[schemas.PortfolioTransaction] ,db: 
     
 @router.post("/add_generali_transaction", response_model=schemas.PortfolioTransaction, status_code=status.HTTP_201_CREATED)
 def add_generali_transaction(generali: schemas.PortfolioTransaction, db: Session = Depends(get_sql_db)):
-    initial_total = generali.initial_amount + generali.deposit_amount
-    growth_percentage = ((generali.total_amount - (generali.initial_amount + generali.deposit_amount)) / initial_total) * 100
+    
 
     generali_entry = models.Generali(
             **generali.model_dump()
     )
-    generali_entry.growth_percentage = growth_percentage
+    
 
     db.add(generali_entry)
     db.commit()
