@@ -30,16 +30,17 @@ def render_transaction_section():
         csv_handler = CSVHandler()
         df_tr = None
         tr_tab1, tr_tab2, tr_tab3  = st.tabs(["Load CSV", "Summary", "Details of transactions"])
-        #FIXME: after addding the transaction additional reset is needed as looks like other transactions are not being added.
+        
 
         with tr_tab1:
             st.title('Load CSV to DB')
             print(f'1/2::: trying to upload a file')
             uploaded_file = st.file_uploader("Choose CSV file", type="csv")
+            print(f'Uploaded file is: {uploaded_file}')
             print(f'2/2::: Code after file uploading')
             
             all_transactions = get_all_transactions()
-            
+            print(all_transactions)
             
 
             if uploaded_file is not None:
@@ -51,6 +52,7 @@ def render_transaction_section():
 
             if all_transactions:
                 df_tr = pd.DataFrame(all_transactions)
+            
 
                 if not df_tr.empty and 'receiver' in df_tr.columns:
                     df_tr = csv_handler.remove_dupl(df=df_tr)

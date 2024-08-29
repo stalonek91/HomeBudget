@@ -16,6 +16,7 @@ class Transaction(Base):
     transaction_type = Column(String(100), nullable=False)
     category = Column(String(100), nullable=False)
     ref_number = Column(String(100), nullable=False, unique=True)
+    exec_month = Column(String(255), nullable=False)
 
 
 class Etoro(Base):

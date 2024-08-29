@@ -46,20 +46,7 @@ class TransactionService:
                     raise
         
         return successfully_added
-        # new_transactions = [model_class(**data) for data in transaction_data]
-        
-        # try:
-        #     self.db.add_all(new_transactions)
-        #     self.db.commit()
-        #     for transaction in new_transactions:
-        #         self.db.refresh(transaction)
-        # except IntegrityError as e:
-        #     self.db.rollback()
-        #     if 'unique constraint' in str(e):
-        #         print(f"DEBUG: No portfolio update needed. All up to date.")
-        #     else:
-        #         print(f"An error occurred while adding data to database: {str(e)}")
-        # return new_transactions
+    
     
 
     def add_transaction(self, model_class: Type[SQLAlchemyModel], transaction_data: Dict[str, Any]) -> SQLAlchemyModel:

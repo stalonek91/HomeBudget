@@ -28,7 +28,8 @@ class CSVHandler:
                                 'amount', 
                                 'transaction_type',
                                 'category',
-                                'ref_number']
+                                'ref_number'
+                                ]
         
     def load_rules(self):
         try:
@@ -49,15 +50,27 @@ class CSVHandler:
             return self.df
 
         except Exception as e:
-            print(f'Error occurred: {str(e)}')
+            print(f'Error occurred in load_csv: {str(e)}')
             return None
         
     def create_df_for_db(self, base_df):
         try:
             base_df.fillna("", inplace=True)
+
+            # Print the first few rows of the base_df to debug
+            print("Initial DataFrame before processing:")
+            print(base_df.head())
+
+            if 'Data księgowania' in base_df.columns:
+                print("Date column before parsing:")
+                print(base_df['Data księgowania'].head())
+
             new_df = base_df[self.columns_to_keep].copy()
+            # Print the first few rows of the new_df for debugging
+            print("New DataFrame after selecting columns:")
+            print(new_df.head())
         except Exception as e:
-            print(f'Error occurred: {str(e)}')
+            print(f'Error occurred in create_df_for_db: {str(e)}')
             return None
         return new_df
     
@@ -66,9 +79,23 @@ class CSVHandler:
         try:
             columns_dict = dict(zip(self.columns_to_keep, self.new_column_names))
             last_df.rename(columns=columns_dict, inplace=True)
+            try:
+
+                last_df['date'] = pd.to_datetime(last_df['date'], format='%d.%m.%Y', errors='coerce')
+
+                last_df['exec_month'] = pd.to_datetime(last_df['date']).dt.strftime('%Y-%m')
+
+                if last_df['exec_month'].isna().any():
+                    print(f'Some "exec_month" values could not be parsed and are set to NaT.')
+                    last_df['exec_month'].fillna('Unknown', inplace=True)
+            except Exception as e:
+                print(f"Error occurred while parsing 'exec_month': {str(e)}")
+
+
             last_df = self.clean_and_format_df(last_df)
+
         except Exception as e:
-                print(f'Error occurred: {str(e)}')
+                print(f'Error occurred in rename_columns: {str(e)}')
                 return None
         return last_df
     
@@ -85,6 +112,8 @@ class CSVHandler:
             last_df.loc[:, 'date'] = last_df['date'].dt.strftime('%Y-%m-%d')
             last_df['amount'] = last_df['amount'].str.replace(',', '.').str.replace(' ', '').astype(float)
 
+            last_df['exec_month'] = last_df['exec_month'].astype(str)
+
 
             if not last_df['ref_number'].is_unique:
                 duplicate_values = last_df['ref_number'][last_df['ref_number'].duplicated()].unique()
@@ -93,7 +122,7 @@ class CSVHandler:
             return last_df
         
         except Exception as e:
-            print(f'Error occurred: {str(e)}')
+            print(f'Error occurred clean_and_format_df: {str(e)}')
             return None
 
 

@@ -51,6 +51,7 @@ class UpdateTransactionSchema(BaseModel):
     transaction_type: Optional[str] = None
     category: Optional[str] = None
     ref_number: Optional[str] = None
+    exec_month: Optional[str] = None
 
     class Config:
         orm_mode = True

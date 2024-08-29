@@ -10,6 +10,7 @@ import app.models as models
 from app.transaction_service import TransactionService
 import pandas as pd
 from io import StringIO
+from datetime import datetime
 
 router = APIRouter(tags=["db_operations"], prefix="/transactions")
 
@@ -38,13 +39,20 @@ def get_summary(db: Session = Depends(get_sql_db)):
 @router.post("/add_csv", status_code=status.HTTP_201_CREATED)
 def add_csv(file: UploadFile = File(...), db: Session = Depends(get_sql_db)):
 
+    added_month = None
+
     print('Entering POST /add_csv request')
     print(('Loading CSV attempt: ...'))
 
     content = file.file.read().decode('utf-8')
+    print('Raw CSV content:')
+    print(content)
+
     df = pd.read_csv(StringIO(content), delimiter=';')
 
-    print(f'TOP5 rows of df: {df.head(5)}')
+    print(f' Wczytany DF to: {df.head(5)}')
+
+    
 
     csv_instance = CSVHandler(df)
     df = csv_instance.load_csv()
@@ -58,11 +66,11 @@ def add_csv(file: UploadFile = File(...), db: Session = Depends(get_sql_db)):
         if new_df is None:
                 raise HTTPException(status_code=500, detail="Error processing DataFrame in create_df_for_db")
 
-        print(f"Type of new_df: {type(new_df)}")
-        print(new_df.head())
+        
     
         try:
             df_to_dict = new_df.to_dict(orient='index')
+            print('Dictionary representation of DataFrame:')
             print(df_to_dict[0])
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error converting DataFrame to dict: {str(e)}")
