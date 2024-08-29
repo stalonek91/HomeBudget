@@ -51,7 +51,6 @@ class Vienna(Base):
     initial_amount = Column(Numeric(10, 2), nullable=False)
     deposit_amount = Column(Numeric(10, 2), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
-    growth_percentage = Column(Numeric(5, 2), nullable=True)
 
 class Revolut(Base):
 

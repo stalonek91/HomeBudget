@@ -247,6 +247,7 @@ def get_time_delta(tab):
 
 def get_wallet_metrics(df, tab):
     wallet_data = fetch_wallet_totals(tab)
+    
     last_entry, last_month_entry = wallet_data[-1], wallet_data[-2]
     
     total_amount = last_entry['total_amount']

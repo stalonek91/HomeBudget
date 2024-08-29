@@ -14,6 +14,14 @@ from datetime import datetime
 
 router = APIRouter(tags=["db_operations"], prefix="/transactions")
 
+@router.get("/get_timeline", status_code=status.HTTP_200_OK)
+def get_timeline(db: Session = Depends(get_sql_db)):
+       timelines = {}
+       for index, value in enumerate(db.query(models.Transaction.exec_month).distinct()):
+              timelines[index] = value[0]
+              
+       return timelines
+
 @router.get("/get_summary", response_model=schemas.ReturnSummary, status_code=status.HTTP_200_OK)
 def get_summary(db: Session = Depends(get_sql_db)):
     income = db.query(func.sum(models.Transaction.amount)).filter(

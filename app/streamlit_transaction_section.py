@@ -24,6 +24,13 @@ def get_all_transactions():
     else:
         st.error(f"Failed to fetch response data: {response.status_code}")
 
+def get_timeline():
+    response = requests.get(f"{FASTAPI_URL}/transactions/get_timeline/")
+    if response.status_code == 200:
+        return response.json()
+    else:
+        st.error(f"Failed to fetch response data: {response.status_code}")
+
 
 def render_transaction_section():
         
@@ -47,11 +54,27 @@ def render_transaction_section():
                 response = add_csv_to_db(uploaded_file)
                 if response is not None:
                     st.success(response)
+
+            elif len(all_transactions) > 0:
+                pass
+
             else:
                 st.info("Please upload a CSV file")
 
+            time_lines = get_timeline()
+            timelines = list(time_lines.values())
+            
+            timeline_selection = st.multiselect(
+                "Select timeline to display:",
+                timelines,
+                key=f"transaction_timelines"
+            )
+
+
             if all_transactions:
+                
                 df_tr = pd.DataFrame(all_transactions)
+                
             
 
                 if not df_tr.empty and 'receiver' in df_tr.columns:
