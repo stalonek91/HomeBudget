@@ -29,13 +29,14 @@ class PortfolioTransaction(BaseModel):
 #Schema for transaction table operation
 class TransactionSchema(BaseModel):
     
-    id: Optional[int] = None
+    # id: Optional[int] = None
     date: date
     receiver: str
-    title: str
+    # title: str
     amount: float
     transaction_type: str
     category: str
+    exec_month: str
 
     class Config:
         orm_mode = True

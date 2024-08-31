@@ -70,20 +70,24 @@ def render_transaction_section():
                 key=f"transaction_timelines"
             )
 
-            
-
+            print(f'timeline_selection is : {timeline_selection}')
 
             if all_transactions:
-                
                 df_tr = pd.DataFrame(all_transactions)
-                
-            
 
-                if not df_tr.empty and 'receiver' in df_tr.columns:
-                    df_tr = csv_handler.remove_dupl(df=df_tr)
-                    st.dataframe(df_tr)
+                if not timeline_selection:
+
+                    if not df_tr.empty and 'receiver' in df_tr.columns:
+                        df_tr = csv_handler.remove_dupl(df=df_tr)
+                        st.dataframe(df_tr)
+                    else:
+                        st.warning("DataFrame is empty or 'receiver' column not found.")
+
                 else:
-                    st.warning("DataFrame is empty or 'receiver' column not found.")
+                    print(f'Timeline selection is: {timeline_selection}')
+                    filtered_df = df_tr[df_tr['exec_month'].isin(timeline_selection)]
+
+                    st.dataframe(filtered_df)
 
             else:
                 st.info("No transactions available in the database.")
