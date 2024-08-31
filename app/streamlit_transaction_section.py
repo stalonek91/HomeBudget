@@ -101,10 +101,19 @@ def render_transaction_section():
         with tr_tab3:
             tr_col1, tr_col2 = st.columns(2)
 
+            timeline_selection_details = st.multiselect(
+                "Select timeline to display:",
+                timelines,
+                key=f"timeline_selection_details"
+            )
+
             with tr_col1:
 
                 st.title(f'Expenses')
-                grouped_df = df_tr.groupby('receiver')['amount'].sum().reset_index()
+
+                filtered_df_summary = df_tr[df_tr['exec_month'].isin(timeline_selection_details)]
+
+                grouped_df = filtered_df_summary.groupby('receiver')['amount'].sum().reset_index()
                 grouped_df = grouped_df[grouped_df['amount'] < 0]
                 grouped_df.columns = ['Reciever', 'Value']
 
@@ -118,7 +127,7 @@ def render_transaction_section():
             with tr_col2:
 
                 st.title(f'Income')
-                grouped_df = df_tr.groupby('receiver')['amount'].sum().reset_index()
+                grouped_df = filtered_df_summary.groupby('receiver')['amount'].sum().reset_index()
                 grouped_df = grouped_df[grouped_df['amount'] > 0]
                 grouped_df.columns = ['Reciever', 'Value']
 
