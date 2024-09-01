@@ -122,8 +122,7 @@ def create_portfolio_summary_chart(df):
     st.plotly_chart(fig)
 
 def render_summary_section():
-    #TODO: Create same metrics for each wallet with total value profit and sum of deposits
-    #TODO: It requires change and addint profit table to db and the models + some endpoint functions
+
     portfolio_summary = generate_summary_overall()
     st.markdown("<h1 style='text-align: center;'>Portfolio summary</h1>", unsafe_allow_html=True)
     

@@ -36,7 +36,7 @@ def render_transaction_section():
         
         csv_handler = CSVHandler()
         df_tr = None
-        tr_tab1, tr_tab2, tr_tab3  = st.tabs(["Load CSV", "Summary", "Details of transactions"])
+        tr_tab1, tr_tab2, tr_tab3  = st.tabs(["Load CSV", "Details of transactions", "Summary"])
         
 
         with tr_tab1:
@@ -92,13 +92,8 @@ def render_transaction_section():
             else:
                 st.info("No transactions available in the database.")
 
-                    
-            
-
         with tr_tab2:
-            pass
-
-        with tr_tab3:
+            met_col1, met_col2, met_col3 = st.columns(3)
             tr_col1, tr_col2 = st.columns(2)
 
             timeline_selection_details = st.multiselect(
@@ -107,6 +102,8 @@ def render_transaction_section():
                 key=f"timeline_selection_details"
             )
 
+            
+
             with tr_col1:
 
                 st.title(f'Expenses')
@@ -114,29 +111,45 @@ def render_transaction_section():
                 filtered_df_summary = df_tr[df_tr['exec_month'].isin(timeline_selection_details)]
 
                 grouped_df = filtered_df_summary.groupby('receiver')['amount'].sum().reset_index()
-                grouped_df = grouped_df[grouped_df['amount'] < 0]
-                grouped_df.columns = ['Reciever', 'Value']
+                grouped_df_exp = grouped_df[grouped_df['amount'] < 0]
+                grouped_df_exp.columns = ['Reciever', 'Value']
 
                 #Reseting index
-                grouped_df.reset_index(drop=True, inplace=True)
-                grouped_df.index = grouped_df.index + 1
-                grouped_df.index.name = "Row Number"
+                grouped_df_exp.reset_index(drop=True, inplace=True)
+                grouped_df_exp.index = grouped_df_exp.index + 1
+                grouped_df_exp.index.name = "Row Number"
 
-                st.dataframe(grouped_df, use_container_width=True)
+                st.dataframe(grouped_df_exp, use_container_width=True)
 
             with tr_col2:
 
                 st.title(f'Income')
                 grouped_df = filtered_df_summary.groupby('receiver')['amount'].sum().reset_index()
-                grouped_df = grouped_df[grouped_df['amount'] > 0]
-                grouped_df.columns = ['Reciever', 'Value']
+                grouped_df_inc = grouped_df[grouped_df['amount'] > 0]
+                grouped_df_inc.columns = ['Reciever', 'Value']
 
                 #Reseting index
-                grouped_df.reset_index(drop=True, inplace=True)
-                grouped_df.index = grouped_df.index + 1
-                grouped_df.index.name = "Row Number"
+                grouped_df_inc.reset_index(drop=True, inplace=True)
+                grouped_df_inc.index = grouped_df_inc.index + 1
+                grouped_df_inc.index.name = "Row Number"
 
-                st.dataframe(grouped_df)
+                st.dataframe(grouped_df_inc)
+
+            with met_col1:
+                if timeline_selection_details:
+                    
+                    sum_of_exp = round(grouped_df_exp['Value'].sum(), 2)
+                    st.metric(label='Expenses', value=sum_of_exp)
+                
+
+            with met_col2:
+                if timeline_selection_details:
+                    
+                    sum_of_inc = round(grouped_df_inc['Value'].sum(), 2)
+                    st.metric(label='Income', value=sum_of_inc)
+
+            with met_col3:
+                st.write("Savings")
 
             add_left, add_middle, add_right = st.columns(3, vertical_alignment="bottom")
             
@@ -147,3 +160,7 @@ def render_transaction_section():
                 print(f"Pressing add rule button adding folowing key:{rule_key} and val:{rule_val}")
                 csv_handler.add_rule(rule_key=rule_key, rule_value=rule_val)
                 st.rerun()
+
+
+            with tr_tab3:
+                pass
