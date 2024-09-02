@@ -65,11 +65,11 @@ def render_transaction_section():
         if df_tr is not None and not df_tr.empty:
             df_tr = csv_handler.remove_dupl(df=df_tr)
             time_lines = get_timeline()
-            timelines = list(time_lines.values())
+            # timelines = list(time_lines.values())
 
             timeline_selection = st.multiselect(
                 "Select timeline to display:",
-                timelines,
+                time_lines,
                 key=f"transaction_timelines"
             )
 
@@ -92,7 +92,7 @@ def render_transaction_section():
 
             timeline_selection_details = st.multiselect(
                 "Select timeline to display:",
-                timelines,
+                time_lines,
                 key=f"timeline_selection_details"
             )
 

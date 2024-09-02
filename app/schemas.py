@@ -91,3 +91,10 @@ class PortfolioSummarySchema(BaseModel):
         orm_mode = True
 
 
+
+class ADDCSVResponse(BaseModel):
+     status: str
+     records_processed: int
+
+     class Config:
+        orm_mode = True

@@ -1,35 +1,39 @@
-from fastapi import status, Depends, Body, HTTPException, Request, APIRouter, UploadFile, File
+from fastapi import status, Depends, Body, HTTPException, APIRouter, UploadFile, File
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from typing import List
-from .. csv_handler import CSVHandler
+from io import StringIO
+import pandas as pd
+import logging
+
+from app.csv_handler import CSVHandler
 from app.database import get_sql_db
 import app.schemas as schemas
 import app.models as models
 from app.transaction_service import TransactionService
-import pandas as pd
-from io import StringIO
-from datetime import datetime
+
+
+
 
 router = APIRouter(tags=["db_operations"], prefix="/transactions")
 
 @router.get("/get_timeline", status_code=status.HTTP_200_OK)
 def get_timeline(db: Session = Depends(get_sql_db)):
-       timelines = {}
-       for index, value in enumerate(db.query(models.Transaction.exec_month).distinct()):
-              timelines[index] = value[0]
-              
+
+       timelines = [value[0] for index, value in enumerate(db.query(models.Transaction.exec_month).distinct())]
        return timelines
 
 @router.get("/get_summary", response_model=schemas.ReturnSummary, status_code=status.HTTP_200_OK)
 def get_summary(db: Session = Depends(get_sql_db)):
-    income = db.query(func.sum(models.Transaction.amount)).filter(
-            models.Transaction.amount > 0).scalar()
-    print(type(income))
-    
-    expenses = db.query(func.sum(models.Transaction.amount)).filter(
-            models.Transaction.amount <0).scalar()
+    try:
+        income = db.query(func.sum(models.Transaction.amount)).filter(
+                models.Transaction.amount > 0).scalar()
+        expenses = db.query(func.sum(models.Transaction.amount)).filter(
+                models.Transaction.amount <0).scalar()
+    except Exception as e:
+           logging.error(f"Database error: {str(e)}")
+           raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
 
     income_float = float(income) if income is not None else 0.0
     expenses_float = float(expenses) if expenses is  not None else 0.0
@@ -42,25 +46,22 @@ def get_summary(db: Session = Depends(get_sql_db)):
     return response
 
 
-
-#FIXME: change the logic to allow file to be passed instead of path
-@router.post("/add_csv", status_code=status.HTTP_201_CREATED)
+@router.post("/add_csv",response_model=schemas.ADDCSVResponse, status_code=status.HTTP_201_CREATED)
 def add_csv(file: UploadFile = File(...), db: Session = Depends(get_sql_db)):
 
     added_month = None
 
-    print('Entering POST /add_csv request')
-    print(('Loading CSV attempt: ...'))
+    logging.info('Entering POST /add_csv request')
+    logging.debug('Loading CSV attempt...')
 
     content = file.file.read().decode('utf-8')
-    print('Raw CSV content:')
-    print(content)
+    logging.debug('Raw CSV content:')
+    logging.debug(content)
 
     df = pd.read_csv(StringIO(content), delimiter=';')
 
-    print(f' Wczytany DF to: {df.head(5)}')
+    logging.debug(f'Loaded DataFrame head: {df.head(5)}')
 
-    
 
     csv_instance = CSVHandler(df)
     df = csv_instance.load_csv()
@@ -68,10 +69,12 @@ def add_csv(file: UploadFile = File(...), db: Session = Depends(get_sql_db)):
     if df is not None:
         new_df = csv_instance.create_df_for_db(df)
         if new_df is None:
+                logging.error("Error processing DataFrame in create_df_for_db")
                 raise HTTPException(status_code=500, detail="Error processing DataFrame in create_df_for_db")
         
         new_df = csv_instance.rename_columns(new_df)
         if new_df is None:
+                logging.error("Error processing DataFrame in create_df_for_db")
                 raise HTTPException(status_code=500, detail="Error processing DataFrame in create_df_for_db")
 
         
@@ -81,6 +84,7 @@ def add_csv(file: UploadFile = File(...), db: Session = Depends(get_sql_db)):
             print('Dictionary representation of DataFrame:')
             print(df_to_dict[0])
         except Exception as e:
+            logging.error(f"Error converting DataFrame to dict: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Error converting DataFrame to dict: {str(e)}")
         
 
@@ -89,10 +93,10 @@ def add_csv(file: UploadFile = File(...), db: Session = Depends(get_sql_db)):
             transaction_service.add_transactions(models.Transaction, list(df_to_dict.values()))
             
 
-            return {
-                "status": "success",
-                "records_processed:": len(df_to_dict)
-            }
+            return schemas.ADDCSVResponse(
+                status="success",
+                records_processed=len(df_to_dict)
+            )
 
         except IntegrityError as e:
                db.rollback()
@@ -107,17 +111,25 @@ def add_csv(file: UploadFile = File(...), db: Session = Depends(get_sql_db)):
 
 @router.get("/get_transactions", response_model=List[schemas.TransactionSchema], status_code=status.HTTP_200_OK)
 def get_transactions(db: Session = Depends(get_sql_db)):
-    transactions = db.query(models.Transaction).all()
-    return transactions
+    try:
+        transactions = db.query(models.Transaction).all()
+        return transactions
+    except SQLAlchemyError as e:
+           logging.error(f"Databas error: {str(e)}")
+           raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not retrieve transactions")
 
 
 @router.get("/get_transaction_by_id/{id}", response_model=schemas.ReturnedTransaction, status_code=status.HTTP_200_OK)
 def get_transaction_by_id(id: int, db: Session = Depends(get_sql_db)):
-        transaction = db.query(models.Transaction).filter(models.Transaction.id == id).first()
-        if not transaction:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Transaction with id: {id} not found!')
-        
-        return transaction
+        try:
+            transaction = db.query(models.Transaction).filter(models.Transaction.id == id).first()
+            if not transaction:
+                    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Transaction with id: {id} not found!')
+            
+            return transaction
+        except SQLAlchemyError as e:
+               logging.error(f"Database error in 'get_transaction_by_id/{id}' as {str(e)}")
+               raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not retrieve transactions by ID")
 
 
 @router.post("/add_transaction", response_model=schemas.TransactionSchema, status_code=status.HTTP_201_CREATED)
