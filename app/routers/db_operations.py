@@ -119,30 +119,39 @@ def get_transactions(db: Session = Depends(get_sql_db)):
            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not retrieve transactions")
 
 
-@router.get("/get_transaction_by_id/{id}", response_model=schemas.ReturnedTransaction, status_code=status.HTTP_200_OK)
-def get_transaction_by_id(id: int, db: Session = Depends(get_sql_db)):
+@router.get("/get_transaction_by_id/{transaction_id}", response_model=schemas.ReturnedTransaction, status_code=status.HTTP_200_OK)
+def get_transaction_by_id(transaction_id: int, db: Session = Depends(get_sql_db)):
         try:
-            transaction = db.query(models.Transaction).filter(models.Transaction.id == id).first()
+            logging.info(f"Fetching transaction with id {transaction_id}")
+
+            transaction = db.query(models.Transaction).filter(models.Transaction.id == transaction_id).first()
             if not transaction:
-                    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Transaction with id: {id} not found!')
+                    logging.warning(f"Transaction with id {transaction_id} not found.")
+                    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Transaction with id: {transaction_id} not found!')
             
             return transaction
         except SQLAlchemyError as e:
-               logging.error(f"Database error in 'get_transaction_by_id/{id}' as {str(e)}")
+               logging.error(f"Database error in 'get_transaction_by_id/{transaction_id}' as {str(e)}")
                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not retrieve transactions by ID")
 
 
 @router.post("/add_transaction", response_model=schemas.TransactionSchema, status_code=status.HTTP_201_CREATED)
-def add_transaction(transaction: schemas.TransactionSchema, db: Session = Depends(get_sql_db)):
-                    new_transaction = models.Transaction(
-                            **transaction.model_dump()
-                    )
-                    db.add(new_transaction)
-                    db.commit()
-                    db.refresh(new_transaction)
+def add_transaction(transaction_data: schemas.TransactionSchema, db: Session = Depends(get_sql_db)):
+                    try:
+                        logging.info(f"Transaction added with ID {new_transaction.id}")
+                        new_transaction = models.Transaction(
+                                **transaction_data.model_dump()
+                        )
+                        db.add(new_transaction)
+                        db.commit()
+                        db.refresh(new_transaction)
 
-                    
-                    return new_transaction
+                        
+                        return new_transaction
+                    except SQLAlchemyError as e:
+                           db.rollback()
+                           logging.error(f"Add transaction failed as {str(e)}")
+                           raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed at adding transaction")
 
 
 @router.put("/update_transaction/{id}", response_model=schemas.ReturnedTransaction, status_code=status.HTTP_200_OK)
