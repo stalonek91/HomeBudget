@@ -161,16 +161,22 @@ def update_transaction(id: int, transaction_data: schemas.TransactionSchema = Bo
 
 
         if not transaction:
+                logging.warning(f"Transaction with id {id} not found for update.")
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Transaction with id: {id} not found!')
         
-        print(f'Transaction_data: {transaction_data.model_dump()}')
+        logging.debug(f'Transaction_data for update: {transaction_data.model_dump()}')
+
         try:
             transaction_query.update(transaction_data.model_dump(), synchronize_session=False)
             db.commit()
-        except Exception as e:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Following error occured {str(e)}')
+            db.refresh(transaction)
+            return transaction
+        except SQLAlchemyError() as e:
+                logging.error(f"Error updating transaction with id {id}: {str(e)}")
+                db.rollback()
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'Error occurred: {str(e)}')
         
-        return transaction
+        
 
 
 @router.patch("/partialupdate_transaction/{id}", response_model=schemas.ReturnedTransaction, status_code=status.HTTP_200_OK)
@@ -180,16 +186,22 @@ def partial_update(id: int, transaction_data: schemas.UpdateTransactionSchema = 
         transaction = transaction_query.first()
 
         if not transaction:
+                logging.warning(f"Transaction with id {id} not found for update.")
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Looked transaction not found id: {id}')
         
         transaction_body = transaction_data.model_dump(exclude_unset=True)
         print(f'Printing content for PATCH request: {transaction_body}')
 
-        for k,v in transaction_body.items():
-                setattr(transaction,k,v)
-        
-        db.commit()
-        db.refresh(transaction)
-
-        return transaction
+        try:
+            for k,v in transaction_body.items():
+                    setattr(transaction,k,v)
+            
+            db.commit()
+            db.refresh(transaction)
+            return transaction
+        except SQLAlchemyError as e:
+            logging.error(f"Error partially updating transaction with id {id}: {str(e)}")
+            db.rollback()
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to partially update transaction")
+              
         

@@ -1,28 +1,21 @@
 import pandas as pd
 import json
-
+import logging
 
 
 class CSVHandler:
 
     dict_of_rules = {}
 
-    def __init__(self, df: pd.DataFrame = None) -> None:
-
-        self.load_rules()
-
-        
-
-        self.df = df
-        self.columns_to_keep = [
+    columns_to_keep = [
             'Data księgowania',
             'Nadawca / Odbiorca',
             'Tytułem', 'Kwota operacji',
             'Typ operacji',
             'Kategoria',
             'Numer referencyjny']
-        
-        self.new_column_names = ['date',
+    
+    new_column_names = ['date',
                                 'receiver',
                                 'title',
                                 'amount', 
@@ -30,73 +23,107 @@ class CSVHandler:
                                 'category',
                                 'ref_number'
                                 ]
+
+    def __init__(self, df: pd.DataFrame = None) -> None:
+
+        self._load_rules()
+        self.df = df
         
-    def load_rules(self):
+        
+        
+        
+    def _load_rules(self):
         try:
             with open('rules_dict.json', 'r') as file:
                 CSVHandler.dict_of_rules = json.load(file)
+        except FileNotFoundError as e:
+            logging.error(f" File not found: {str(e)}")
+
+        except json.JSONDecodeError() as e:
+            logging.error(f" Error while decoding JSON: {str(e)}")
+
         except Exception as e:
-            print(f'ERROR: Something went wrong loading the json file with rules. Details: {str(e)}')
+            logging.error(f" Unexpected error loading rules: {str(e)}")
 
     def save_rules(self):
-        with open('rules_dict.json', 'w') as file:
-            json.dump(CSVHandler.dict_of_rules, file)
-            print(f'INFO: Rule JSON file saved succesfully')
+        try:
+            with open('rules_dict.json', 'w') as file:
+                json.dump(CSVHandler.dict_of_rules, file)
+                print(f'INFO: Rule JSON file saved succesfully')
+        except IOError as e:
+            logging.error(f"File I/O error: {str(e)}")
+        except Exception as e:
+            logging.error(f"Unexpected error saving rules: {str(e)}")
 
 
     def load_csv(self):
-        try:
-            print('CSV file loaded succesfully')
+            
+            if self.df is None:
+                logging.error('No DataFrame available to load')
+                raise ValueError("DataFrame is not set")
+            
+            logging.info(f"CSV dataframe loaded successfully")
             return self.df
 
-        except Exception as e:
-            print(f'Error occurred in load_csv: {str(e)}')
-            return None
+
+    def _check_missing_columns(self, df, columns):
+        """
+        Private helper method to check for missing columns in a DataFrame.
+        """
+
+        missing_columns = [col for col in self.columns_to_keep if col not in df.columns]
+        if missing_columns:
+            logging.error(f"Missing columns in Dataframe: {missing_columns}")
+            raise ValueError(f"Missing columns in Dataframe: {missing_columns}")
         
+
     def create_df_for_db(self, base_df):
         try:
             base_df.fillna("", inplace=True)
+            self._check_missing_columns(df=base_df, columns=self.columns_to_keep)
 
-            # Print the first few rows of the base_df to debug
-            print("Initial DataFrame before processing:")
+            
+            logging.debug("Initial DataFrame before processing:")
             print(base_df.head())
 
             if 'Data księgowania' in base_df.columns:
-                print("Date column before parsing:")
-                print(base_df['Data księgowania'].head())
+                logging.debug("Date column before parsing:")
+                logging.debug(f'{base_df['Data księgowania'].head()}')
 
             new_df = base_df[self.columns_to_keep].copy()
-            # Print the first few rows of the new_df for debugging
-            print("New DataFrame after selecting columns:")
-            print(new_df.head())
+            
+            logging.debug("New DataFrame after selecting columns:")
+            logging.debug(f'{new_df.head()}')
+
         except Exception as e:
-            print(f'Error occurred in create_df_for_db: {str(e)}')
+            logging.error(f"Error processing CSV: {str(e)}")
             return None
         return new_df
     
 
     def rename_columns(self, last_df):
         try:
+            self._check_missing_columns(df=last_df, columns=self.columns_to_keep)
+
             columns_dict = dict(zip(self.columns_to_keep, self.new_column_names))
             last_df.rename(columns=columns_dict, inplace=True)
-            try:
+            
+            last_df['date'] = pd.to_datetime(last_df['date'], format='%d.%m.%Y', errors='coerce')
+            last_df['exec_month'] = last_df['date'].dt.strftime('%Y-%m')
 
-                last_df['date'] = pd.to_datetime(last_df['date'], format='%d.%m.%Y', errors='coerce')
-
-                last_df['exec_month'] = pd.to_datetime(last_df['date']).dt.strftime('%Y-%m')
-
-                if last_df['exec_month'].isna().any():
-                    print(f'Some "exec_month" values could not be parsed and are set to NaT.')
-                    last_df['exec_month'].fillna('Unknown', inplace=True)
-            except Exception as e:
-                print(f"Error occurred while parsing 'exec_month': {str(e)}")
-
-
+            if last_df['exec_month'].isna().any():
+                logging.warning(f'Some "exec_month" values could not be parsed and are set to NaT.')
+                last_df['exec_month'].fillna('Unknown', inplace=True)
+            
             last_df = self.clean_and_format_df(last_df)
 
-        except Exception as e:
-                print(f'Error occurred in rename_columns: {str(e)}')
+        except KeyError as e:
+                logging.error(f"KeyError occurred in rename_columns: {str(e)}")
                 return None
+        except Exception as e:
+                logging.error(f'Error occurred in rename_columns: {str(e)}')
+                return None
+        
         return last_df
     
     
