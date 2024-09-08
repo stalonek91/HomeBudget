@@ -10,7 +10,7 @@ from app.transaction_service import TransactionService
 
 router = APIRouter(tags=["etoro"], prefix="/etoro")
 
-#TODO: check ruff
+
 
 @router.get("/return_df", status_code=status.HTTP_200_OK)
 def return_df(db: Session = Depends(get_sql_db)):

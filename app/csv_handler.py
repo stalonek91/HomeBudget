@@ -39,7 +39,7 @@ class CSVHandler:
         except FileNotFoundError as e:
             logging.error(f" File not found: {str(e)}")
 
-        except json.JSONDecodeError() as e:
+        except json.JSONDecodeError as e:
             logging.error(f" Error while decoding JSON: {str(e)}")
 
         except Exception as e:
@@ -131,12 +131,14 @@ class CSVHandler:
         try:
 
             last_df.loc[:, 'date'] = pd.to_datetime(last_df['date'], format='%d.%m.%Y', errors='coerce')
+
             last_df['date'] = last_df['date'].astype('datetime64[ns]')
 
             if last_df['date'].isna().any():
-                print("Some dates could not be converted and are set to NaT")
+                logging.warning("Some dates could not be converted and are set to NaT")
 
             last_df.loc[:, 'date'] = last_df['date'].dt.strftime('%Y-%m-%d')
+
             last_df['amount'] = last_df['amount'].str.replace(',', '.').str.replace(' ', '').astype(float)
 
             last_df['exec_month'] = last_df['exec_month'].astype(str)
@@ -144,12 +146,13 @@ class CSVHandler:
 
             if not last_df['ref_number'].is_unique:
                 duplicate_values = last_df['ref_number'][last_df['ref_number'].duplicated()].unique()
+                logging.error(f"Duplicate ref_number values found: {duplicate_values}")
                 raise ValueError(f"The column ref_number contains duplicate values: {duplicate_values}")
 
             return last_df
         
         except Exception as e:
-            print(f'Error occurred clean_and_format_df: {str(e)}')
+            logging.error(f'Error occurred clean_and_format_df: {str(e)}')
             return None
 
 
@@ -162,12 +165,20 @@ class CSVHandler:
         return df
     
     def add_rule(self, rule_key, rule_value):
-        if rule_key in CSVHandler.dict_of_rules:
-            CSVHandler.dict_of_rules[rule_key].append(rule_value)
-        else:
-            CSVHandler.dict_of_rules[rule_key] = [rule_value]
-        self.save_rules()
-        print(f"New rule added: {rule_key} -> {rule_value}")
+        try:
+            if not isinstance(rule_value, str):
+                raise ValueError(f"Rule value must be a string. Got  {type(rule_value).__name__} instead")
+            CSVHandler.dict_of_rules.setdefault(rule_key, []).append(rule_value)
+            self.save_rules()
+            logging.info(f"New rule added: {rule_key} -> {rule_value}")
+        
+        except Exception as e:
+            logging.error(f"Error while adding new rule: {str(e)}")
+            raise 
+            
+        
+        
+       
 
 
 
