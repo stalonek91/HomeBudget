@@ -52,13 +52,14 @@ def test_save_rules_success():
 
     CSVHandler.dict_of_rules = {"Wycieczki/Hotel": ["BOOKING", "PARKHOTEL"]}
     
-    with patch("builtins.open", mock_open()) as mocked_file:
-        with patch("json.dump") as mocked_json_dump:
-            handler = CSVHandler()
-            handler.save_rules()
+    with patch.object(CSVHandler, '_load_rules', return_value=None):
+        with patch("builtins.open", mock_open()) as mocked_file:
+            with patch("json.dump") as mocked_json_dump:
+                handler = CSVHandler()
+                handler.save_rules()
 
-            mocked_file.assert_called_once_with('rules_dict.json', 'w')
-            mocked_json_dump.assert_called_once_with(CSVHandler.dict_of_rules, mocked_file)
+                mocked_file.assert_called_once_with('rules_dict.json', 'w')
+                mocked_json_dump.assert_called_once_with(CSVHandler.dict_of_rules, mocked_file())
 
 
 def test_save_rules_ioerror():
