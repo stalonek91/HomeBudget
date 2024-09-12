@@ -7,6 +7,7 @@ from app.database import get_sql_db
 import app.schemas as schemas
 import app.models as models
 from app.transaction_service import TransactionService
+from decimal import Decimal
 
 router = APIRouter(tags=["generali_endpoints"], prefix="/generali")
 
@@ -59,8 +60,19 @@ def add_many_generali(generali_entries: List[schemas.PortfolioTransaction] ,db: 
 def add_generali_transaction(generali: schemas.PortfolioTransaction, db: Session = Depends(get_sql_db)):
     
 
-    generali_entry = models.Generali(
-            **generali.model_dump()
+    latest_entry = db.query(models.Generali).order_by(models.Generali.date.desc()).first()
+    print(latest_entry.deposit_amount)
+
+    if latest_entry:
+         new_deposit_amount = latest_entry.deposit_amount + Decimal(generali.deposit_amount)
+    else:
+         new_deposit_amount = Decimal(generali.deposit_amount)
+         
+
+    generali_entry = models.Generali()(
+            date=generali.date,
+            deposit_amount=new_deposit_amount,
+            total_amount=generali.total_amount
     )
     
 

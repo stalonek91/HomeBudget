@@ -7,6 +7,7 @@ from app.database import get_sql_db
 import app.schemas as schemas
 import app.models as models
 from app.transaction_service import TransactionService
+from decimal import Decimal
 
 router = APIRouter(tags=["nokia_endpoints"], prefix="/nokia")
 
@@ -59,8 +60,19 @@ def add_many_nokia(nokia_entries: List[schemas.PortfolioTransaction] ,db: Sessio
 def add_nokia_transaction(nokia: schemas.PortfolioTransaction, db: Session = Depends(get_sql_db)):
     
 
+    latest_entry = db.query(models.Nokia).order_by(models.Nokia.date.desc()).first()
+    print(latest_entry.deposit_amount)
+
+    if latest_entry:
+         new_deposit_amount = latest_entry.deposit_amount + Decimal(nokia.deposit_amount)
+    else:
+         new_deposit_amount = Decimal(nokia.deposit_amount)
+         
+
     nokia_entry = models.Nokia(
-            **nokia.model_dump()
+            date=nokia.date,
+            deposit_amount=new_deposit_amount,
+            total_amount=nokia.total_amount
     )
     
 

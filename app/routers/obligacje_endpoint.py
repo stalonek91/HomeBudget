@@ -7,6 +7,7 @@ from app.database import get_sql_db
 import app.schemas as schemas
 import app.models as models
 from app.transaction_service import TransactionService
+from decimal import Decimal
 
 router = APIRouter(tags=["obligacje_endpoints"], prefix="/obligacje")
 
@@ -60,8 +61,19 @@ def add_many_obligacje(obligacje_entries: List[schemas.PortfolioTransaction] ,db
 def add_obligacje_transaction(obligacje: schemas.PortfolioTransaction, db: Session = Depends(get_sql_db)):
     
 
+    latest_entry = db.query(models.Obligacje).order_by(models.Obligacje.date.desc()).first()
+    print(latest_entry.deposit_amount)
+
+    if latest_entry:
+         new_deposit_amount = latest_entry.deposit_amount + Decimal(obligacje.deposit_amount)
+    else:
+         new_deposit_amount = Decimal(obligacje.deposit_amount)
+         
+
     obligacje_entry = models.Obligacje(
-            **obligacje.model_dump()
+            date=obligacje.date,
+            deposit_amount=new_deposit_amount,
+            total_amount=obligacje.total_amount
     )
     
 

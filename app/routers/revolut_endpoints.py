@@ -7,6 +7,7 @@ from app.database import get_sql_db
 import app.schemas as schemas
 import app.models as models
 from app.transaction_service import TransactionService
+from decimal import Decimal
 
 router = APIRouter(tags=["revolut_endpoints"], prefix="/revolut")
 
@@ -59,8 +60,19 @@ def add_many_revolut(revolut_entries: List[schemas.PortfolioTransaction] ,db: Se
 def add_revolut_transaction(revolut: schemas.PortfolioTransaction, db: Session = Depends(get_sql_db)):
     
 
+    latest_entry = db.query(models.Revolut).order_by(models.Revolut.date.desc()).first()
+    print(latest_entry.deposit_amount)
+
+    if latest_entry:
+         new_deposit_amount = latest_entry.deposit_amount + Decimal(revolut.deposit_amount)
+    else:
+         new_deposit_amount = Decimal(revolut.deposit_amount)
+         
+
     revolut_entry = models.Revolut(
-            **revolut.model_dump()
+            date=revolut.date,
+            deposit_amount=new_deposit_amount,
+            total_amount=revolut.total_amount
     )
     
 

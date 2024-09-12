@@ -8,6 +8,7 @@ import app.schemas as schemas
 import app.models as models
 from app.transaction_service import TransactionService
 from datetime import datetime
+from decimal import Decimal
 
 router = APIRouter(tags=["vienna_endpoints"], prefix="/vienna")
 
@@ -65,8 +66,19 @@ def add_many_vienna(vienna_entries: List[schemas.PortfolioTransaction] ,db: Sess
 def add_vienna_transaction(vienna: schemas.PortfolioTransaction, db: Session = Depends(get_sql_db)):
     
 
+    latest_entry = db.query(models.Vienna).order_by(models.Vienna.date.desc()).first()
+    print(latest_entry.deposit_amount)
+
+    if latest_entry:
+         new_deposit_amount = latest_entry.deposit_amount + Decimal(vienna.deposit_amount)
+    else:
+         new_deposit_amount = Decimal(vienna.deposit_amount)
+         
+
     vienna_entry = models.Vienna(
-            **vienna.model_dump()
+            date=vienna.date,
+            deposit_amount=new_deposit_amount,
+            total_amount=vienna.total_amount
     )
     
 
