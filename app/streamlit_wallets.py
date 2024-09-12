@@ -88,7 +88,6 @@ def add_transcation(tab, data):
 
     payload = {
         "date": data.get('date'),
-        "initial_amount": data.get('initial_amount'),
         "deposit_amount": data.get('deposit_amount'),
         "total_amount": data.get('total_amount')
     }
@@ -291,14 +290,11 @@ def generate_wallet_tab(tab):
 
     st.write(f'Add {tab} entry:')
 
-    col1, col2, col3, col4, col5 = st.columns(5, vertical_alignment="bottom")
+    col1, col3, col4, col5 = st.columns(4, vertical_alignment="bottom")
 
     with col1:
         v_date = st.date_input("Date of entry", key=f"{tab}_date_input")
         f_date = v_date.strftime('%Y-%m-%d')
-
-    with col2:
-        initial_amount = float(st.number_input("Pre deposit amount:", step=100, key=f"{tab}_initial_number"))
 
     with col3:
         deposit_amount = float(st.number_input("Deposit amount:",step=100, key=f"{tab}_deposit_amount"))
@@ -314,7 +310,6 @@ def generate_wallet_tab(tab):
 
         data = {
                 "date": f_date,
-                "initial_amount": initial_amount,
                 "deposit_amount": deposit_amount,
                 "total_amount": total_amount
         }

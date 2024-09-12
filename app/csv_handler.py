@@ -74,21 +74,13 @@ class CSVHandler:
         missing_columns = [col for col in self.columns_to_keep if col not in df.columns]
         if missing_columns:
             logging.error(f"Missing columns in Dataframe: {missing_columns}")
-            raise ValueError(f"Missing columns in Dataframe: {missing_columns}")
+            raise ValueError(f"Missing columns in Dataframe")
         
 
     def create_df_for_db(self, base_df):
         try:
             base_df.fillna("", inplace=True)
             self._check_missing_columns(df=base_df, columns=self.columns_to_keep)
-
-            
-            logging.debug("Initial DataFrame before processing:")
-            print(base_df.head())
-
-            if 'Data księgowania' in base_df.columns:
-                logging.debug("Date column before parsing:")
-                logging.debug(f'{base_df['Data księgowania'].head()}')
 
             new_df = base_df[self.columns_to_keep].copy()
             

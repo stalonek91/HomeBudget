@@ -7,6 +7,7 @@ from app.database import get_sql_db
 import app.schemas as schemas
 import app.models as models
 from app.transaction_service import TransactionService
+from decimal import Decimal
 
 router = APIRouter(tags=["xtb_endpoints"], prefix="/xtb")
 
@@ -59,8 +60,19 @@ def add_many_xtb(xtb_entries: List[schemas.PortfolioTransaction] ,db: Session = 
 def add_xtb_transaction(xtb: schemas.PortfolioTransaction, db: Session = Depends(get_sql_db)):
     
 
+    latest_entry = db.query(models.Xtb).order_by(models.Xtb.date.desc()).first()
+    print(latest_entry.deposit_amount)
+
+    if latest_entry:
+         new_deposit_amount = latest_entry.deposit_amount + Decimal(xtb.deposit_amount)
+    else:
+         new_deposit_amount = Decimal(xtb.deposit_amount)
+         
+
     xtb_entry = models.Xtb(
-            **xtb.model_dump()
+            date=xtb.date,
+            deposit_amount=new_deposit_amount,
+            total_amount=xtb.total_amount
     )
     
 

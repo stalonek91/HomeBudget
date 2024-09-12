@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from .. csv_handler import CSVHandler
 from app.database import get_sql_db
+from decimal import Decimal
 import app.schemas as schemas
 import app.models as models
 from app.transaction_service import TransactionService
@@ -64,9 +65,19 @@ def add_many_etoro(etoro_entries: List[schemas.PortfolioTransaction] ,db: Sessio
 @router.post("/add_etoro_transaction", response_model=schemas.PortfolioTransaction, status_code=status.HTTP_201_CREATED)
 def add_etoro_transaction(etoro: schemas.PortfolioTransaction, db: Session = Depends(get_sql_db)):
    
+    latest_entry = db.query(models.Etoro).order_by(models.Etoro.date.desc()).first()
+    print(latest_entry.deposit_amount)
+
+    if latest_entry:
+         new_deposit_amount = latest_entry.deposit_amount + Decimal(etoro.deposit_amount)
+    else:
+         new_deposit_amount = Decimal(etoro.deposit_amount)
+         
 
     etoro_entry = models.Etoro(
-            **etoro.model_dump()
+            date=etoro.date,
+            deposit_amount=new_deposit_amount,
+            total_amount=etoro.total_amount
     )
     
 

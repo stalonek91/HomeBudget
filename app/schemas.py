@@ -15,7 +15,6 @@ class PortfolioTransaction(BaseModel):
 
     id: Optional[int] = None
     date: date
-    initial_amount: float
     deposit_amount: float
     total_amount: float
     

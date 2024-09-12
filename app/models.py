@@ -25,7 +25,6 @@ class Etoro(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date, nullable=False)
-    initial_amount = Column(Numeric(10, 2), nullable=False)
     deposit_amount = Column(Numeric(10, 2), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
     
@@ -36,7 +35,6 @@ class Xtb(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date, nullable=False)
-    initial_amount = Column(Numeric(10, 2), nullable=False)
     deposit_amount = Column(Numeric(10, 2), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
     
@@ -48,7 +46,6 @@ class Vienna(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date, nullable=False)
-    initial_amount = Column(Numeric(10, 2), nullable=False)
     deposit_amount = Column(Numeric(10, 2), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
 
@@ -58,7 +55,6 @@ class Revolut(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date, nullable=False)
-    initial_amount = Column(Numeric(10, 2), nullable=False)
     deposit_amount = Column(Numeric(10, 2), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
     
@@ -69,7 +65,6 @@ class Obligacje(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date, nullable=False)
-    initial_amount = Column(Numeric(10, 2), nullable=False)
     deposit_amount = Column(Numeric(10, 2), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
     
@@ -81,7 +76,6 @@ class Generali(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date, nullable=False)
-    initial_amount = Column(Numeric(10, 2), nullable=False)
     deposit_amount = Column(Numeric(10, 2), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
     
@@ -92,7 +86,6 @@ class Nokia(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date, nullable=False)
-    initial_amount = Column(Numeric(10, 2), nullable=False)
     deposit_amount = Column(Numeric(10, 2), nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
     
