@@ -70,9 +70,20 @@ class CSVHandler:
         """
         Private helper method to check for missing columns in a DataFrame.
         """
+        logging.info("RENAME COLUMNS --> _CHECK MISSING COLUMNS FUNCTION")
+        print("Calling _check_missing_columns")
+        df_columns = df.columns.tolist()
+        
 
-        missing_columns = [col for col in self.columns_to_keep if col not in df.columns]
+        columns_stripped = [col.strip() for col in self.columns_to_keep]
+        df_columns_stripped = [col.strip() for col in df_columns]
+        
+
+        missing_columns = [col for col in columns_stripped if col not in df_columns_stripped]
+        print(f'Printing missing columns: {missing_columns}')
+        
         if missing_columns:
+            print(f'Missing columns is not empty condition TRUE')
             logging.error(f"Missing columns in Dataframe: {missing_columns}")
             raise ValueError(f"Missing columns in Dataframe")
         
@@ -95,6 +106,7 @@ class CSVHandler:
 
     def rename_columns(self, last_df):
         try:
+            logging.info("RENAME COLUMNS FUNCTION")
             self._check_missing_columns(df=last_df, columns=self.columns_to_keep)
 
             columns_dict = dict(zip(self.columns_to_keep, self.new_column_names))
@@ -111,9 +123,6 @@ class CSVHandler:
 
         except KeyError as e:
                 logging.error(f"KeyError occurred in rename_columns: {str(e)}")
-                return None
-        except Exception as e:
-                logging.error(f'Error occurred in rename_columns: {str(e)}')
                 return None
         
         return last_df

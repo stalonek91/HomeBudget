@@ -186,5 +186,30 @@ def test_create_df_for_db_nok(test_df_with_nok):
 
 
 
-def test_rename_columns_OK():
+def test_rename_columns_missing_columns():
+
+    data_with_missing_column = {
+    'Data księgowania': ["2024-01-01", "2024-01-02", "2024-01-03"],
+    'Nadawca / Odbiorca': ["Alice", "Bob", "Charlie"],
+    'Tytułem': ["Payment", "Invoice", "Refund"],
+    'Kwota operacji': [100.50, -20.00, 35.75],
+    # 'Typ operacji' is intentionally missing
+    'Kategoria': ["Food", "Rent", "Utilities"],
+    'Numer referencyjny': ["TXN001", "TXN002", "TXN003"]
+}
+    
+    df_with_missing_columns = pd.DataFrame(data_with_missing_column)
+
+    handler = CSVHandler()
+
+    with patch.object(handler, '_load_rules', return_value=None):
+        with patch("logging.error") as mock_log_error:
+            print("Columns in DataFrame:", df_with_missing_columns.columns)
+            print("Columns in DataFrame:", handler.columns_to_keep)
+            with pytest.raises(ValueError, match="Missing columns in Dataframe"):
+                handler.rename_columns(df_with_missing_columns)
+
+            mock_log_error.assert_called_once_with("Missing columns in Dataframe: ['Typ operacji']")
+
+
     

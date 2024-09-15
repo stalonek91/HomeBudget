@@ -69,7 +69,7 @@ def add_generali_transaction(generali: schemas.PortfolioTransaction, db: Session
          new_deposit_amount = Decimal(generali.deposit_amount)
          
 
-    generali_entry = models.Generali()(
+    generali_entry = models.Generali(
             date=generali.date,
             deposit_amount=new_deposit_amount,
             total_amount=generali.total_amount
