@@ -212,4 +212,50 @@ def test_rename_columns_missing_columns():
             mock_log_error.assert_called_once_with("Missing columns in Dataframe: ['Typ operacji']")
 
 
+
+def test_rename_columns_columns_name():
+
+        data = {
+            'Data księgowania': ["2024-01-01", "2024-01-02", "2024-01-03"],
+            'Nadawca / Odbiorca': ["Alice", "Bob", "Charlie"],
+            'Tytułem': ["Payment", "Invoice", "Refund"],
+            'Kwota operacji': [100.50, -20.00, 35.75],
+            'Typ operacji' : 'zadna',
+            'Kategoria': ["Food", "Rent", "Utilities"],
+            'Numer referencyjny': ["TXN001", "TXN002", "TXN003"]
+            }
+        
+        data_df = pd.DataFrame(data)
+        handler = CSVHandler()
+        
+        test_columns_to_keep = [
+
+            'Data księgowania',
+            'Nadawca / Odbiorca',
+            'Tytułem', 'Kwota operacji',
+            'Typ operacji',
+            'Kategoria',
+            'Numer referencyjny']
+    
+        test_new_column_names = [
+
+            'date',
+            'receiver',
+            'title',
+            'amount', 
+            'transaction_type',
+            'category',
+            'ref_number',
+            'exec_month'
+                                    ]
+        
+        handler.columns_to_keep = test_columns_to_keep
+        handler.new_column_names = test_new_column_names
+        handler.rename_columns(data_df)
+
+        assert list(data_df.columns) == test_new_column_names
+
+
+
+
     

@@ -117,7 +117,7 @@ class CSVHandler:
 
             if last_df['exec_month'].isna().any():
                 logging.warning(f'Some "exec_month" values could not be parsed and are set to NaT.')
-                last_df['exec_month'].fillna('Unknown', inplace=True)
+                last_df['exec_month'] = last_df['exec_month'].fillna('Unknown')
             
             last_df = self.clean_and_format_df(last_df)
 
@@ -138,7 +138,8 @@ class CSVHandler:
             if last_df['date'].isna().any():
                 logging.warning("Some dates could not be converted and are set to NaT")
 
-            last_df.loc[:, 'date'] = last_df['date'].dt.strftime('%Y-%m-%d')
+            
+            last_df['date'] = last_df['date'].fillna(pd.NaT).dt.strftime('%Y-%m-%d')
 
             last_df['amount'] = last_df['amount'].str.replace(',', '.').str.replace(' ', '').astype(float)
 
