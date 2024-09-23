@@ -45,7 +45,7 @@ def render_transaction_section():
         print(f'2/2::: Code after file uploading')
 
         all_transactions = get_all_transactions()
-        print(all_transactions)
+        
 
         if uploaded_file is not None:
             response = add_csv_to_db(uploaded_file)

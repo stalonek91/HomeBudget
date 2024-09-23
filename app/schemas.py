@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import date
 from typing import Optional
 
@@ -17,10 +17,11 @@ class PortfolioTransaction(BaseModel):
     date: date
     deposit_amount: float
     total_amount: float
+
+    model_config = ConfigDict(from_attributes=True)
     
 
-    class Config:
-        orm_mode = True
+    
 
 
 
@@ -37,8 +38,9 @@ class TransactionSchema(BaseModel):
     category: str
     exec_month: str
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
+
+    
 
 
 class UpdateTransactionSchema(BaseModel):
@@ -53,8 +55,9 @@ class UpdateTransactionSchema(BaseModel):
     ref_number: Optional[str] = None
     exec_month: Optional[str] = None
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
+
+    
 
 class ReturnedTransaction(BaseModel):
     id: int
@@ -64,8 +67,9 @@ class ReturnedTransaction(BaseModel):
     category: str
     ref_number: str
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
+
+    
 
 
 class ReturnSummary(BaseModel):
@@ -85,9 +89,7 @@ class PortfolioSummarySchema(BaseModel):
     Total_Value: float
     Deposits: float
 
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 
@@ -95,5 +97,7 @@ class ADDCSVResponse(BaseModel):
      status: str
      records_processed: int
 
-     class Config:
-        orm_mode = True
+     model_config = ConfigDict(from_attributes=True)
+
+     
+     

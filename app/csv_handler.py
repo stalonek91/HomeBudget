@@ -153,16 +153,20 @@ class CSVHandler:
 
             return last_df
         
+        except ValueError as e:
+            logging.error(f'Error occurred clean_and_format_df: {str(e)}')
+            raise
+        
         except Exception as e:
             logging.error(f'Error occurred clean_and_format_df: {str(e)}')
             return None
 
 
     def remove_dupl(self, df):
- 
+        print(f'Printing dict of rules: {CSVHandler.dict_of_rules}')
         for category, patterns in CSVHandler.dict_of_rules.items():
             df['receiver'] = df['receiver'].apply(
-                lambda x: category if any (pattern in x for pattern in patterns) else x
+                lambda x: (print(f"Replacing '{x}' with '{category}'") or  category) if any (pattern in x for pattern in patterns) else x
             )
         return df
     

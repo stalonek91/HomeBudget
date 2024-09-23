@@ -9,6 +9,32 @@ from app.csv_handler import CSVHandler
 def reset_dict_of_rules():
     CSVHandler.dict_of_rules = {}
 
+
+@pytest.fixture
+def clean_format_sample():
+    sample_data = {
+        'date': ["01.01.2024", "15.05.2022", "03.06.2021"],
+        'amount': ["1 000,50", "2 500,00", "300,75"],  # Amounts with spaces and commas
+        'exec_month': ["2024-01", "2022-05", "2021-06"],
+        'ref_number': ["TXN001", "TXN002", "TXN003"]
+    }
+
+    return sample_data
+
+@pytest.fixture
+def clean_format_expected():
+
+    
+    expected_data = {
+        'date': ["2024-01-01", "2022-05-15", "2021-06-03"],
+        'amount': [1000.50, 2500.00, 300.75],  # Cleaned amounts as floats
+        'exec_month': ["2024-01", "2022-05", "2021-06"],
+        'ref_number': ["TXN001", "TXN002", "TXN003"]
+    }
+
+    return expected_data
+
+
 @pytest.fixture
 def test_df():
     data = {
@@ -257,5 +283,73 @@ def test_rename_columns_columns_name():
 
 
 
+def test_clean_and_format_df_date_parsing(clean_format_expected, clean_format_sample):
+    
+
+    last_df = pd.DataFrame(clean_format_sample)
+    expected_df = pd.DataFrame(clean_format_expected)
+
+    handler = CSVHandler()
+    output_df = handler.clean_and_format_df(last_df)
+
+    assert list(output_df['date']) == ["2024-01-01", "2022-05-15", "2021-06-03"]
+
+
+def test_clean_and_format_df_amount_parsing(clean_format_sample, clean_format_expected):
+
+    last_df = pd.DataFrame(clean_format_sample)
+    expected_df = pd.DataFrame(clean_format_expected)
+
+    handler = CSVHandler()
+    output_df = handler.clean_and_format_df(last_df)
+
+    assert list(output_df['amount']) == [1000.50, 2500.00, 300.75]
+
+
 
     
+def test_clean_and_format_df_duplicates():
+
+    sample_data = {
+        'date': ["01.01.2024", None, "15.05.2022"],  # Second date is missing
+        'amount': ["100,50", "200,00", "300,00"],
+        'exec_month': ["2024-01", "2024-02", "2022-05"],
+        'ref_number': ["TXN001", "TXN001", "TXN003"]
+                         }
+
+    last_df = pd.DataFrame(sample_data)
+    handler = CSVHandler()
+    
+
+    with pytest.raises(ValueError, match="The column ref_number contains duplicate values"):
+        print(last_df['date'])
+        handler.clean_and_format_df(last_df)
+
+
+def test_clean_and_format_df_missing_dates():
+        
+        sample_data = {
+        'date': ["01.01.2024", '01.0202', "15.05.2022"],  # Second date is missing
+        'amount': ["100,50", "200,00", "300,00"],
+        'exec_month': ["2024-01", "2024-02", "2022-05"],
+        'ref_number': ["TXN001", "TXN002", "TXN003"]
+                         }
+        
+        last_df = pd.DataFrame(sample_data)
+        handler = CSVHandler()
+        output_df = handler.clean_and_format_df(last_df)
+
+        expected_dates = ['2024-01-01', None, '2022-05-15']
+
+        for i, date in enumerate(output_df['date']):
+            if pd.isna(date):
+                assert pd.isna(expected_dates[i])
+            else:
+                assert date == expected_dates[i]
+
+def test_clean_and_format_df_remove_dupl(clean_format_sample):
+    handler = CSVHandler()
+    handler.remove_dupl(clean_format_sample)
+
+        
+        
