@@ -30,6 +30,32 @@ def mock_db_session(mocker):
     return mock_session
 
 
+@pytest.fixture
+def mock_transaction_service(mocker):
+    """
+    Fixture to mock the Transaction service class.
+    """
+
+    mock_service_instance = MagicMock()
+    mocker.patch('main.TransactionService', return_value=mock_service_instance)
+    return mock_service_instance
+
+
+def mock_csv_handler(mocker):
+    """
+    Fixture to mock the CSV handler class and it's methods.
+    """
+
+    mock_handler_instance = MagicMock()
+    mocker.patch('main.CSVHandler', return_value=mock_handler_instance)
+
+    mock_handler_instance.load_csv.return_value = MagicMock()
+    mock_handler_instance.create_df_for_db.return_value = MagicMock()
+    mock_handler_instance.rename_columns.return_value = MagicMock()
+
+    return mock_handler_instance
+
+
 
 
 def test_get_timeline():
