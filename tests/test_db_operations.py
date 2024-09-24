@@ -56,12 +56,52 @@ def mock_csv_handler(mocker):
     return mock_handler_instance
 
 
+def test_db_operations_add_transactions_valid_CSV(mocker, mock_db_session, mock_transaction_service, mock_csv_handler):
+
+    csv_file = StringIO(SAMPLE_CSV_CONTENT)
+    files = {
+        'file': ('test.csv', csv_file, 'text/csv')
+    }
+
+    expected_records = 4
+    mock_new_df = mock_csv_handler.rename_columns.return_value
+    mock_new_df.to_dict.return_value
+
+    
+    mock_new_df = mock_csv_handler.rename_columns.return_value
+    mock_new_df.to_dict.return_value = {
+        0: {'id': 1, 'date': '2024-08-29', 'receiver': 'ZABKA Z7582', 'amount': -6.99},
+        1: {'id': 2, 'date': '2024-08-29', 'receiver': 'BIEDRONKA 1234', 'amount': -10.50},
+        2: {'id': 3, 'date': '2024-08-28', 'receiver': 'PETROL STATION', 'amount': 50.00},
+        3: {'id': 4, 'date': '2024-08-27', 'receiver': 'SUPERMARKET XYZ', 'amount': -20.00}
+    }
+
+    response = client.post("/transactions/add_csv", files=files)
+    
+    assert response.status_code == 201, f"Expected status code 201, got {response.status_code}"
+    response_json = response.json()
+    assert response_json["status"] == "success", f"Exepcted status 'success', got {response_json['status']}"
+    assert response_json["records_processed"] == expected_records, (f"Expected records_processed {expected_records}, got {response_json["records_processed"]}")
+
+    mock_csv_handler.load_csv.assert_called_once()
+    mock_csv_handler.create_df_for_db.assert_called_once()
+    mock_csv_handler.rename_columns.assert_called_once()
+
+    app.main.TransactionService.assert_called_once_with(mock_db_session)
+    mock_transaction_service.add_transactions.assert_called_once()
+
+    #Optionally, verify the arguments passed to add_transactions
+    args, kwargs = mock_transaction_service.add_transactions.call_args
+    assert args[0] == 'models.Transaction'
+    assert len(args[1]) == expected_records
+    
 
 
 def test_get_timeline():
 
     test_output = [
     "2024-07",
+    "2024-06",
     "2024-08"
 ]
 
@@ -86,4 +126,4 @@ def test_get_summary():
     print (f" Income is :{response_data['income']} Expenses is: {response_data['expenses']}")
 
 
-def test_db_operations_add_transactions_valid_CSV():
+
